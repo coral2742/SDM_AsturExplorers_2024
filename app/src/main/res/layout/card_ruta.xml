@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardElevation="4dp"
+        app:cardCornerRadius="8dp"
+        app:cardBackgroundColor="@color/verde_suave">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvTitulo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Titulo cualquiera"
+                    android:textColor="@color/black"
+                    android:textSize="30sp" />
+
+                <ImageButton
+                    android:id="@+id/favoriteImageButton"
+                    android:layout_width="75dp"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:contentDescription="Favorito"
+                    android:src="@android:drawable/btn_star" />
+
+
+            </LinearLayout>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="8dp" /> <!-- Altura del espacio -->
+            <!-- Layout horizontal para los TextViews y la imagen -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Contenedor para los TextViews -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp"> <!-- Espacio entre TextViews e imagen -->
+
+                    <TextView
+                        android:id="@+id/tvDistancia"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Distancia"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvDistanciaReal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="texto"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"/>
+
+                    <TextView
+                        android:id="@+id/tvDificultad"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Dificultad"
+                        android:textSize="20sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvDificultadReal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="texto"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"/>
+
+                    <TextView
+                        android:id="@+id/tvRecorrido"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tipo de recorrido"
+                        android:textSize="20sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvRecorridoReal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="texto"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <!-- Imagen a la derecha -->
+                <ImageView
+                    android:id="@+id/cardImage"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:contentDescription="Imagen del CardView"
+                    android:scaleType="centerCrop"
+                    tools:srcCompat="@drawable/cares" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

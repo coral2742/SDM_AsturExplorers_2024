@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".MainActivity">
 
     <RelativeLayout
@@ -42,11 +43,13 @@
         android:id="@+id/navigationbtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="#FAFFF7"
+        app:itemIconTint="@color/green"
+        app:itemTextColor="@color/black"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:labelVisibilityMode="labeled"
         app:layout_constraintStart_toStartOf="parent"
-        app:itemIconTint="@color/green"
         app:menu="@menu/navegation_menu" />
 
     <TextView
@@ -76,10 +79,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@id/navigationbtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/navigationbtn"
         app:navGraph="@navigation/navigation"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="376dp" />

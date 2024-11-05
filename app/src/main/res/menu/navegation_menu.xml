@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/navigation_rutas"
+        android:icon="@drawable/marker"
+        android:title="Rutas" />
+
+    <item
+        android:id="@+id/navigation_rutas_cercanas"
+        android:icon="@drawable/walking"
+        android:title="Rutas Cercanas" />
+
+
+    <item
+        android:id="@+id/navigation_favoritos"
+        android:icon="@drawable/favoritos"
+        android:title="Favoritos" />
+
+    <item
+        android:id="@+id/navigation_mi_perfil"
+        android:icon="@drawable/profile"
+        android:title="Mi Perfil" />
+
+
+</menu>

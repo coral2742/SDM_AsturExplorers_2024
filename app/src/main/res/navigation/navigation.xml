@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/rutasFragment">
+
+
+    <fragment
+        android:id="@+id/rutasFragment"
+        android:name="sdm.com.asturexplorers.RutasFragment"
+        android:label="fragment_rutas"
+        tools:layout="@layout/fragment_rutas" />
+    <fragment
+        android:id="@+id/rutasCercanasFragment"
+        android:name="sdm.com.asturexplorers.RutasCercanasFragment"
+        android:label="fragment_rutas_cercanas"
+        tools:layout="@layout/fragment_rutas_cercanas" />
+    <fragment
+        android:id="@+id/miPerfilFragment"
+        android:name="sdm.com.asturexplorers.MiPerfilFragment"
+        android:label="fragment_mi_perfil"
+        tools:layout="@layout/fragment_mi_perfil" />
+    <fragment
+        android:id="@+id/favoritosFragment"
+        android:name="sdm.com.asturexplorers.FavoritosFragment"
+        android:label="FavoritosFragment" />
+
+
+
+</navigation>

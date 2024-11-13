@@ -2,6 +2,11 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Asturexplorers" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/verde_suave</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+
+
     </style>
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <!-- Color del indicador activo -->
+        <item name="android:color">@color/verde_suave</item>
+    </style>
+</resources>

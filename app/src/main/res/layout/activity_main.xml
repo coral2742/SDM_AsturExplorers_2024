@@ -50,7 +50,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/navegation_menu" />
+        app:menu="@menu/navegation_menu"
+        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"/>
 
     <TextView
         android:id="@+id/txtRutas"

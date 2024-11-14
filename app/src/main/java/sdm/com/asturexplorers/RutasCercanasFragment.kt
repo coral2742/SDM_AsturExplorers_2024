@@ -34,4 +34,8 @@ class RutasCercanasFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_rutas_cercanas, container, false)
     }
+
+    companion object {
+        fun newInstance(): RutasCercanasFragment = RutasCercanasFragment()
+    }
 }

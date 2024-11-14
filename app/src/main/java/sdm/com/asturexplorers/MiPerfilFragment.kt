@@ -24,4 +24,8 @@ class MiPerfilFragment : Fragment() {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_mi_perfil, container, false)
     }
+
+    companion object {
+        fun newInstance(): MiPerfilFragment = MiPerfilFragment()
+    }
 }

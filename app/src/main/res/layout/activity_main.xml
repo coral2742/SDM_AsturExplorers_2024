@@ -39,6 +39,7 @@
             android:textSize="24sp" />
     </RelativeLayout>
 
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigationbtn"
         android:layout_width="0dp"
@@ -59,20 +60,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="Rutas"
+        android:text=""
         android:textColor="#000000"
         android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/navigationbtn"
-        app:layout_constraintTop_toBottomOf="@+id/txtRutas"
-        tools:layout_editor_absoluteX="4dp" />
 
     <fragment
         android:id="@+id/fragmentContainerView"
@@ -80,11 +73,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@id/navigationbtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/navigation"
+        app:layout_constraintBottom_toTopOf="@id/navigationbtn"
+        app:navGraph="@navigation/navigacion"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="376dp" />
 

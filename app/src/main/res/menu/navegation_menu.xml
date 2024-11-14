@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <item
         android:id="@+id/navigation_rutas"
         android:icon="@drawable/marker"
-        android:title="Rutas" />
+        android:title="Rutas"
+        app:destination="@id/navigation_rutas"
+        />
 
     <item
         android:id="@+id/navigation_rutas_cercanas"
         android:icon="@drawable/walking"
-        android:title="Rutas Cercanas" />
+        android:title="Rutas Cercanas"
+        app:destination="@id/navigation_rutas_cercanas"
+        />
 
 
     <item
         android:id="@+id/navigation_favoritos"
         android:icon="@drawable/favoritos"
-        android:title="Favoritos" />
+        android:title="Favoritos"
+        app:destination="@id/navigation_favoritos"
+        />
 
     <item
         android:id="@+id/navigation_mi_perfil"
         android:icon="@drawable/profile"
-        android:title="Mi Perfil" />
+        android:title="Mi Perfil"
+        app:destination="@id/navigation_mi_perfil"
+        />
 
 
 </menu>

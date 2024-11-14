@@ -1,8 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.crashlytics)
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs")
+
+
 }
 
 android {
@@ -50,6 +54,17 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.coil)
+
+    // Import the Firebase BoM
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+
+    // Import the Firebase Auth dependency
+    implementation(libs.firebase.auth)
+    // Import the Google Sign-In dependency
+    implementation(libs.google.auth)
+
+
 
 
 }

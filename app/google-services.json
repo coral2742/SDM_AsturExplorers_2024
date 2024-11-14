@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "45836936990",
+    "project_id": "sdm-asturexplorers",
+    "storage_bucket": "sdm-asturexplorers.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45836936990:android:f46acd78e43060857c0b0f",
+        "android_client_info": {
+          "package_name": "sdm.com.asturexplorers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "45836936990-da2parjff1vnlr1s501sa342inp0nbjb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "sdm.com.asturexplorers",
+            "certificate_hash": "c7b7b674604ccfcef0108057835d74b76b69dbe2"
+          }
+        },
+        {
+          "client_id": "45836936990-9ckbtptnd6r1a2oh6rjrgp34s82ev2a8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6EVWsY0sRRe9SH-6YEmCSIeZtgUa0Hk0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "45836936990-9ckbtptnd6r1a2oh6rjrgp34s82ev2a8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

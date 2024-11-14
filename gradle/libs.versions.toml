@@ -13,6 +13,9 @@ constraintlayout = "2.1.4"
 navigationRuntimeKtx = "2.8.3"
 navigationFragmentKtx = "2.8.2"
 navigationUiKtx = "2.8.2"
+firebaseBom = "33.4.0"
+services = "4.4.2"
+crashlytics= "3.0.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,8 +30,18 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref ="firebaseBom" }
+firebase-crashlytics = {module ="com.google.firebase:firebase-crashlytics" }
+firebase-auth = {module = " com.google.firebase:firebase-auth"}
+
+# Google Play Services Auth (para Google Sign-In)
+google-auth = {module = "com.google.android.gms:play-services-auth"}
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+googleServices = { id ="com.google.gms.google-services", version.ref= "services"}
+crashlytics = { id ="com.google.firebase.crashlytics", version.ref="crashlytics"}
+
 

@@ -63,7 +63,7 @@ dependencies {
     implementation(libs.firebase.auth)
     // Import the Google Sign-In dependency
     implementation(libs.google.auth)
-
+    implementation(kotlin("script-runtime"))
 
 
 

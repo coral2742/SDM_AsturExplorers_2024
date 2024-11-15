@@ -39,7 +39,7 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/textTitle"
+        android:id="@+id/txtNombre"
         android:layout_width="273dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
@@ -61,6 +61,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/txtNombre" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,7 +39,7 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/textTitle"
+        android:id="@+id/txtNombre"
         android:layout_width="273dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.crashlytics)
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs")
+    id("com.google.devtools.ksp") version "1.9.24-1.0.20"
 
 
 }
@@ -42,6 +43,13 @@ android {
 }
 
 dependencies {
+
+    implementation("com.google.code.gson:gson:2.8.9")
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

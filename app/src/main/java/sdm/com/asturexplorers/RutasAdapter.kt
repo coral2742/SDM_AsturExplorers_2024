@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import sdm.com.asturexplorers.db.Ruta
 
 
 class RutasAdapter(

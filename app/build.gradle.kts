@@ -69,6 +69,7 @@ dependencies {
     implementation(kotlin("script-runtime"))
 
 
-
+    //Import OSM dependency
+    implementation(libs.osmdroid.android)
 
 }

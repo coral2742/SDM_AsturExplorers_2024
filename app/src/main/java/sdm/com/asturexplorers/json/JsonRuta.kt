@@ -56,7 +56,7 @@ data class TipoRuta(
 )
 
 data class Visualizador(
-    val slide: Slide
+    val slide: Slide?
 )
 
 data class Slide(

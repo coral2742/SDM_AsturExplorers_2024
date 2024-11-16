@@ -9,14 +9,14 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "rutas")
 data class Ruta(
-    @PrimaryKey
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id:Int = 0,
     val nombre: String,
     val distancia: Double,
     val dificultad: String,
+    @ColumnInfo(name = "tipo_recorrido")
     val tipoRecorrido: String,
-    val descripcion: String,
-    @ColumnInfo(name = "imagen_url")
+    @ColumnInfo(name = "image_url")
     val imagenUrl: String
 ): Parcelable {
 }

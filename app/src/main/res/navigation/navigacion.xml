@@ -10,8 +10,7 @@
         android:id="@+id/navigation_rutas"
         android:name="sdm.com.asturexplorers.RutasFragment"
         android:label="fragment_rutas"
-        tools:layout="@layout/fragment_rutas"
-        app:defaultNavHost="true">
+        tools:layout="@layout/fragment_rutas">
 
     </fragment>
 
@@ -19,22 +18,20 @@
         android:id="@+id/navigation_favoritos"
         android:name="sdm.com.asturexplorers.FavoritosFragment"
         android:label="fragment_favoritos"
-        tools:layout="@layout/fragment_favoritos"
-        app:defaultNavHost="true" />
+        tools:layout="@layout/fragment_favoritos"/>
+
 
     <fragment
         android:id="@+id/navigation_rutas_cercanas"
         android:name="sdm.com.asturexplorers.RutasCercanasFragment"
         android:label="fragment_rutas_cercanas"
-        tools:layout="@layout/fragment_rutas_cercanas"
-        app:defaultNavHost="true" />
+        tools:layout="@layout/fragment_rutas_cercanas"/>
 
     <fragment
         android:id="@+id/navigation_mi_perfil"
         android:name="sdm.com.asturexplorers.MiPerfilFragment"
         android:label="fragment_mi_perfil"
-        tools:layout="@layout/fragment_mi_perfil"
-        app:defaultNavHost="true" />
+        tools:layout="@layout/fragment_mi_perfil"/>
 
 
 

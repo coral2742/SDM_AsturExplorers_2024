@@ -54,7 +54,7 @@ class MiPerfilFragment : Fragment() {
 
         // Configura Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id)) // Coloca aquí tu ID de cliente web de Firebase
+            .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
@@ -161,6 +161,7 @@ class MiPerfilFragment : Fragment() {
 
         // Verifica si el usuario ya está autenticado
         val currentUser = auth.currentUser
+        SessionManager.currentUser = currentUser
         updateUI(currentUser)
 
         return view
@@ -172,6 +173,7 @@ class MiPerfilFragment : Fragment() {
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     Snackbar.make(requireView(), "Sign-up successful!", Snackbar.LENGTH_SHORT).show()
+                    SessionManager.currentUser = user
                     updateUI(user)
                 } else {
                     Log.w("MiPerfilFragment", "createUserWithEmail:failure", task.exception)
@@ -236,6 +238,7 @@ class MiPerfilFragment : Fragment() {
     private fun signInWithGoogle() {
         val signInIntent = googleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -259,6 +262,7 @@ class MiPerfilFragment : Fragment() {
                 if (task.isSuccessful) {
                     Log.d("MiPerfilFragment", "signInWithCredential:success")
                     val user = auth.currentUser
+                    SessionManager.currentUser = user
                     updateUI(user)
                 } else {
                     Log.w("MiPerfilFragment", "signInWithCredential:failure", task.exception)
@@ -359,6 +363,7 @@ class MiPerfilFragment : Fragment() {
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
+                    SessionManager.currentUser = user
                     updateUI(user)
                 } else {
                     Log.w("MiPerfilFragment", "signInWithEmail:failure", task.exception)
@@ -371,6 +376,7 @@ class MiPerfilFragment : Fragment() {
     private fun signOut() {
         auth.signOut()
         googleSignInClient.signOut().addOnCompleteListener(requireActivity()) {
+            SessionManager.currentUser = null
             updateUI(null)
         }
     }

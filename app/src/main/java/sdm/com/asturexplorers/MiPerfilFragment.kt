@@ -21,6 +21,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MiPerfilFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
@@ -176,6 +177,21 @@ class MiPerfilFragment : Fragment() {
                     Snackbar.make(requireView(), "Sign-up successful!", Snackbar.LENGTH_SHORT).show()
                     SessionManager.currentUser = user
                     updateUI(user)
+                    // añadir usuario a Firebase de rutas favoritas (lista vacía)
+                    val userData = hashMapOf(
+                        "userId" to user?.uid,
+                        "favoritas" to listOf<String>()
+                    )
+                    val db = FirebaseFirestore.getInstance()
+                    db.collection("rutas_favs")
+                        .document(user?.uid ?: "")
+                        .set(userData)
+                        .addOnSuccessListener {
+                            Log.d("Firestore", "Usuario guardado exitosamente")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Firestore", "Error al guardar los datos del usuario: $e")
+                        }
                 } else {
                     Log.w("MiPerfilFragment", "createUserWithEmail:failure", task.exception)
                     Snackbar.make(requireView(), "Error: No se pudo crear la cuenta", Snackbar.LENGTH_SHORT).show()
@@ -265,12 +281,37 @@ class MiPerfilFragment : Fragment() {
                     val user = auth.currentUser
                     SessionManager.currentUser = user
                     updateUI(user)
+
+                    // Verificar si el usuario ya existe en la base de datos
+                    val db = FirebaseFirestore.getInstance()
+                    val userRef = db.collection("rutas_favs").document(user?.uid ?: "")
+
+                    userRef.get().addOnSuccessListener { document ->
+                        if (!document.exists()) {
+                            // El usuario no existe, se añade a la base de datos
+                            val userData = hashMapOf(
+                                "userId" to user?.uid,
+                                "favoritas" to listOf<String>() // Inicializamos con una lista vacía de rutas favoritas
+                            )
+                            userRef.set(userData)
+                                .addOnSuccessListener {
+                                    Log.d("Firestore", "Usuario guardado exitosamente")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("Firestore", "Error al guardar los datos del usuario: $e")
+                                }
+                        }
+                    }.addOnFailureListener { e ->
+                        Log.e("Firestore", "Error al verificar si el usuario existe: $e")
+                    }
+
                 } else {
                     Log.w("MiPerfilFragment", "signInWithCredential:failure", task.exception)
                     updateUI(null)
                 }
             }
     }
+
 
     private fun updateUI(user: FirebaseUser?) {
         // Usuario con sesión iniciada

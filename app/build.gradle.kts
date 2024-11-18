@@ -72,6 +72,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:21.2.0")
 
+    // Import the Firebase Firestore
+    implementation ("com.google.firebase:firebase-firestore")
+
     // Import the Google Sign-In dependency
     implementation(libs.google.auth)
     implementation(kotlin("script-runtime"))
@@ -79,5 +82,7 @@ dependencies {
 
     //Import OSM dependency
     implementation(libs.osmdroid.android)
+
+
 
 }

@@ -17,8 +17,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +46,10 @@ class MainActivity : AppCompatActivity() {
 
 
         setupWithNavController(bottomNavView, navHostFragment)
+
+        auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        SessionManager.currentUser = user
 
 
         }

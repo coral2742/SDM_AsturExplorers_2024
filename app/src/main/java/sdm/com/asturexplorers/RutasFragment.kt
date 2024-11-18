@@ -1,6 +1,7 @@
 package sdm.com.asturexplorers
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,10 @@ import android.view.ViewGroup
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 
 import sdm.com.asturexplorers.db.Ruta
@@ -24,6 +29,8 @@ class RutasFragment : Fragment() {
     private val rutas = mutableListOf<Ruta>()
     private val tramos = mutableListOf<Tramo>()
     private lateinit var jsonParser: JsonParser
+    private val db = FirebaseFirestore.getInstance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +66,73 @@ class RutasFragment : Fragment() {
         this.rutas.addAll(rutas)
         this.tramos.addAll(tramos)
 
-        recyclerView.adapter = RutasAdapter(rutas)
+        // Añadir las rutas a Firebase por primera vez
+        //subirRutasAFirebase(rutas)
+
+        recyclerView.adapter = RutasAdapter(rutas) { ruta ->
+            onFavoritoClicked(ruta)
+        }
+
+        //recyclerView.adapter = RutasAdapter(rutas)
     }
+
+    // opción de añadir a favoritos
+    private fun onFavoritoClicked(ruta: Ruta) {
+        // Comprobar si el usuario está autenticado
+        val user = SessionManager.currentUser
+        if (user != null) {
+            // Si el usuario está autenticado
+            Log.d("RutasFragment", "AÑADIENDO A FAV: Usuario autenticado: ${user.uid}")
+            // Crear un mapa con los datos que quieres guardar (solo el id de la ruta por ahora)
+
+
+            // Añadir la ruta a la colección "favoritos" del usuario
+            db.collection("rutas_favs")
+                .document(user.uid)
+                .update("favoritas", FieldValue.arrayUnion(ruta.nombre))
+                .addOnSuccessListener {
+                    // Mostrar mensaje de SnackBar indicando que se ha añadido a favoritos
+                    Snackbar.make(requireView(), "Ruta añadida a favoritos", Snackbar.LENGTH_SHORT).show()
+                    Log.w("RutasFragment", "Ruta añadida a favoritos ${ruta.nombre}")
+
+                }
+                .addOnFailureListener { e ->
+                    // Si hay algún error al añadir, mostrar mensaje de error
+                    Snackbar.make(requireView(), "Error al añadir la ruta a favoritos", Snackbar.LENGTH_SHORT).show()
+                    Log.w("RutasFragment", "Error al añadir ruta a favoritos", e)
+                }
+
+        } else {
+            // Si el usuario no está autenticado
+            Log.d("RutasFragment", "AÑADIENDO A FAV: No hay usuario autenticado.")
+        }
+    }
+
+    private fun subirRutasAFirebase(rutas: List<Ruta>) {
+        // Iterar sobre la lista de rutas y subirlas a Firestore
+        for (ruta in rutas) {
+            val rutaData = hashMapOf(
+                "nombre" to ruta.nombre,
+                "distancia" to ruta.distancia,
+                "dificultad" to ruta.dificultad,
+                "tipo_recorrido" to ruta.tipoRecorrido,
+                "imagen_url" to ruta.imagenUrl
+            )
+
+            // Crear un nuevo documento en la colección "rutas"
+            db.collection("rutas")
+                .add(rutaData)
+                .addOnSuccessListener { documentReference ->
+                    // Ruta subida exitosamente
+                    Log.d("Firestore", "Ruta añadida con ID: ${documentReference.id}")
+                }
+                .addOnFailureListener { e ->
+                    // Error al añadir la ruta
+                    Log.w("Firestore", "Error añadiendo la ruta", e)
+                }
+        }
+    }
+
 }
 
 

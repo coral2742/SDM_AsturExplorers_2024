@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,8 @@ import sdm.com.asturexplorers.db.Ruta
 
 
 class RutasAdapter(
-    private val listaRutas: List<Ruta>
+    private val listaRutas: List<Ruta>,
+    private val onFavoriteClick: (Ruta) -> Unit
 ) : RecyclerView.Adapter<RutasAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RutasAdapter.ViewHolder {
@@ -22,7 +24,7 @@ class RutasAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(listaRutas[position])
+        holder.bind(listaRutas[position], onFavoriteClick)
     }
 
     override fun getItemCount(): Int {
@@ -39,18 +41,29 @@ class RutasAdapter(
         private val tvRecorrido: TextView = view.findViewById(R.id.tvRecorridoReal)
         private val imageView: ImageView = view.findViewById((R.id.cardImage))
         private var rutaActual: Ruta? = null
+        private val favoriteImageButton: ImageButton = view.findViewById(R.id.favoriteImageButton)
+
+
+
 
         init {
 
         }
         @SuppressLint("SetTextI18n")
-        fun bind(ruta : Ruta) {
+        fun bind(ruta: Ruta, onFavoriteClick: (Ruta) -> Unit) {
             rutaActual = ruta
             tvTitulo.text = ruta.nombre
             tvDificultad.text = ruta.dificultad
             tvRecorrido.text = ruta.tipoRecorrido
             tvDistancia.text = ruta.distancia.toString() + " km"
             imageView.load(ruta.imagenUrl)
+
+            // acción de clic sobre estrella de favoritos
+            favoriteImageButton.setOnClickListener {
+                rutaActual?.let { ruta ->
+                    onFavoriteClick(ruta)
+                }
+            }
 
         }
     }

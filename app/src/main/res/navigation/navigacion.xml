@@ -13,6 +13,9 @@
         tools:layout="@layout/fragment_rutas"
         app:defaultNavHost="true">
 
+        <action
+            android:id="@+id/action_navigation_rutas_to_rutasDetalle"
+            app:destination="@id/rutasDetalle" />
     </fragment>
 
     <fragment
@@ -35,8 +38,11 @@
         android:label="fragment_mi_perfil"
         tools:layout="@layout/fragment_mi_perfil"
         app:defaultNavHost="true" />
-
-
+    <fragment
+        android:id="@+id/rutasDetalle"
+        android:name="sdm.com.asturexplorers.RutasDetalle"
+        android:label="fragment_rutas_detalle"
+        tools:layout="@layout/fragment_rutas_detalle" />
 
 
 </navigation>

@@ -22,7 +22,7 @@ class JsonParser(private val gson: Gson) {
             val article = articles.get(i).asJsonObject
 
             // Parse ruta
-            val ruta = parseRuta(article)
+            val ruta = parseRuta(article, i)
 
             // Parse tramos
             val tramosElement = article.get("Tramos")
@@ -45,7 +45,7 @@ class JsonParser(private val gson: Gson) {
         return Pair(rutas, tramos)
     }
 
-    private fun parseRuta(article: JsonObject): Ruta {
+    private fun parseRuta(article: JsonObject, index: Int): Ruta {
         val nombre = article.getAsJsonObject("Nombre").get("content").asString
         val distanciaContenido = article.getAsJsonObject("Contacto").getAsJsonObject("Distancia")
         val distancia = if (distanciaContenido.has("content")) {
@@ -78,6 +78,7 @@ class JsonParser(private val gson: Gson) {
                 "https://www.turismoasturias.es/documents/$groupId/$classPK/$title/$uuid"
         }
         return Ruta(
+            index,
             nombre = nombre,
             distancia = distancia,
             dificultad = when (dificultad) {

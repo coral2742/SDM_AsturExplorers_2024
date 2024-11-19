@@ -18,6 +18,7 @@ osmdroidAndroid = "6.1.10"
 services = "4.4.2"
 crashlytics= "3.0.2"
 glide = "4.15.0"
+firebaseFirestoreKtx = "25.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +40,7 @@ firebase-auth = {module = " com.google.firebase:firebase-auth"}
 # Google Play Services Auth (para Google Sign-In)
 google-auth = {module = "com.google.android.gms:play-services-auth"}
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 
 
 [plugins]

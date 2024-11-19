@@ -44,7 +44,7 @@ class RutasCercanasFragment : Fragment() {
         mapView.setTileSource(TileSourceFactory.MAPNIK)
 
         // Configurar zoom
-        mapView.controller.setZoom(21)
+        mapView.controller.setZoom(17)
         mapView.setMultiTouchControls(true) // Permite zoom con los dedos
 
         //

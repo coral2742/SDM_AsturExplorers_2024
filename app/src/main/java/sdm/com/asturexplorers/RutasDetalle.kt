@@ -1,13 +1,15 @@
 package sdm.com.asturexplorers
 
 import android.os.Bundle
+import android.text.Html
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
@@ -61,20 +63,24 @@ class RutasDetalle : Fragment() {
         tramos = args.tramos
         imagen.load(ruta.imagenUrl)
         tvNombreRuta.text = ruta.nombre
-        tvDistanciaRuta.text = ruta.distancia.toString()
-        tvDistanciaInfoData.text = ruta.distancia.toString()
+        tvDistanciaRuta.text = ruta.distancia.toString() + " Km"
+        tvDistanciaInfoData.text = ruta.distancia.toString() + " Km"
         tvDificultadInfoData.text = ruta.dificultad
         tvTipoRecorridonfoData.text = ruta.tipoRecorrido
         var cadena = ""
         for (tramo in tramos){
-            cadena += tramo.descripcion + "\n"
+            var descripcionHtml = tramo.descripcion
+            var descripcionTextoPlano = HtmlCompat.fromHtml(descripcionHtml,
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            ).toString()
+            cadena += descripcionTextoPlano + "\n"
         }
         tvDescipcionInfoData.text = cadena
 
-        val atras = view.findViewById<Button>(R.id.favoriteImageAtras)
+        val atras = view.findViewById<ImageButton>(R.id.favoriteImageAtras)
         atras.setOnClickListener { findNavController().popBackStack() }
 
-        val favoritos = view.findViewById<Button>(R.id.favoriteImageButtonDetalles)
+        val favoritos = view.findViewById<ImageButton>(R.id.favoriteImageButtonDetalles)
         favoritos.setOnClickListener {
 
 

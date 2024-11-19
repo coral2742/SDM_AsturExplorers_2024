@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "rutas")
 data class Ruta(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     val id:Int = 0,
     val nombre: String,
     val distancia: Double,

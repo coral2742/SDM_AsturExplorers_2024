@@ -1,5 +1,6 @@
 package sdm.com.asturexplorers
 
+import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +12,10 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.config.Configuration
 import android.content.Context
+import android.location.LocationManager
 import org.osmdroid.library.BuildConfig
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 
 /**
@@ -50,14 +54,21 @@ class RutasCercanasFragment : Fragment() {
         //
         val startPoint = GeoPoint(43.3548, -5.8512)
 
+        //
+        val contextGPS = GpsMyLocationProvider(context?.applicationContext)
+        val myLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context),mapView)
+        mapView.overlays.add(myLocationOverlay)
+        myLocationOverlay.enableMyLocation()
+        myLocationOverlay.enableFollowLocation()
+
         // Centro en la ubicación indicada
-        mapView.controller.setCenter(startPoint)
+        mapView.controller.setCenter(myLocationOverlay.myLocation)
 
         // Añadir un marcador
         val marker = Marker(mapView)
-        marker.position = startPoint
+        marker.position = myLocationOverlay.myLocation
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        marker.title = "Escuela de Ingeniería Informática"
+        marker.title = "Estas aquí"
         mapView.overlays.add(marker)
         return view
     }

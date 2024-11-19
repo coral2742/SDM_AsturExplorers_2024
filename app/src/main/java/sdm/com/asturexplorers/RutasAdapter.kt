@@ -14,13 +14,14 @@ import sdm.com.asturexplorers.db.Ruta
 
 class RutasAdapter(
     private val listaRutas: List<Ruta>,
-    private val onFavoriteClick: (Ruta) -> Unit
+    private val onFavoriteClick: (Ruta) -> Unit,
+    private val onClickListener: (Ruta?) -> Unit
 ) : RecyclerView.Adapter<RutasAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RutasAdapter.ViewHolder {
         val layoutElement = R.layout.card_ruta
         val view = LayoutInflater.from(parent.context).inflate(layoutElement, parent, false)
-        return ViewHolder(view)
+        return ViewHolder(view, onClickListener)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -32,7 +33,8 @@ class RutasAdapter(
     }
 
     class ViewHolder(
-        view: View
+        view: View,
+        onClickListener: (Ruta?) -> Unit
     ) : RecyclerView.ViewHolder(view) {
 
         private val tvTitulo: TextView = view.findViewById(R.id.tvTitulo)
@@ -43,11 +45,10 @@ class RutasAdapter(
         private var rutaActual: Ruta? = null
         private val favoriteImageButton: ImageButton = view.findViewById(R.id.favoriteImageButton)
 
-
-
-
         init {
-
+            view.setOnClickListener { it ->
+                onClickListener(rutaActual)
+            }
         }
         @SuppressLint("SetTextI18n")
         fun bind(ruta: Ruta, onFavoriteClick: (Ruta) -> Unit) {

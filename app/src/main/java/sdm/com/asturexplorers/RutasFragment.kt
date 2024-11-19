@@ -70,15 +70,22 @@ class RutasFragment : Fragment() {
         // Añadir las rutas a Firebase por primera vez
         //subirRutasAFirebase(rutas)
 
-        recyclerView.adapter = RutasAdapter(rutas) { ruta ->
-            val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
-            val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
-                tramosArray.toTypedArray()
-            )
-            findNavController().navigate(destino)
-            onFavoritoClicked(ruta)
-        }
-
+        recyclerView.adapter = RutasAdapter(
+            rutas,
+            onFavoriteClick = { ruta ->
+                onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
+            },
+            onClickListener = { ruta ->
+                // Manejo del clic en un elemento de la lista
+                if (ruta != null){
+                    val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id   }
+                    val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
+                        tramosArray.toTypedArray()
+                    )
+                    findNavController().navigate(destino)
+                }
+            }
+        )
         //recyclerView.adapter = RutasAdapter(rutas)
     }
 

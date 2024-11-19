@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -70,6 +71,11 @@ class RutasFragment : Fragment() {
         //subirRutasAFirebase(rutas)
 
         recyclerView.adapter = RutasAdapter(rutas) { ruta ->
+            val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
+            val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
+                tramosArray.toTypedArray()
+            )
+            findNavController().navigate(destino)
             onFavoritoClicked(ruta)
         }
 

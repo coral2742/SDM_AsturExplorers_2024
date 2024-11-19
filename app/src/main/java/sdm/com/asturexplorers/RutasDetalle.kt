@@ -5,55 +5,87 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import coil.load
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import sdm.com.asturexplorers.db.Ruta
+import sdm.com.asturexplorers.db.Tramo
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [RutasDetalle.newInstance] factory method to
- * create an instance of this fragment.
- */
 class RutasDetalle : Fragment() {
+    private lateinit var imagen: ImageView
+    private lateinit var tvNombreRuta: TextView
+    private lateinit var tvDistanciaRuta: TextView
+    private lateinit var tvDistanciaInfoData: TextView
+    private lateinit var tvDificultadInfoData: TextView
+    private lateinit var tvTipoRecorridonfoData: TextView
+    private lateinit var tvDescipcionInfoData: TextView
+
+    private lateinit var ruta : Ruta
+    private lateinit var tramos : Array<Tramo>
+
+    private val args : RutasDetalleArgs by this.navArgs()
+
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_rutas_detalle, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RutasDetalle.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            RutasDetalle().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        imagen = view.findViewById(R.id.imageRuta)
+        tvNombreRuta = view.findViewById(R.id.tvNombreRuta)
+        tvDistanciaRuta = view.findViewById(R.id.tvDistanciaRuta)
+        tvDistanciaInfoData = view.findViewById(R.id.tvDistanciaInfoData)
+        tvDificultadInfoData = view.findViewById(R.id.tvDificultadInfoData)
+        tvTipoRecorridonfoData = view.findViewById(R.id.tvTipoRecorridoInfoData)
+        tvDescipcionInfoData = view.findViewById(R.id.tvDescripcionInfoData)
+
+        ruta = args.ruta
+        tramos = args.tramos
+        imagen.load(ruta.imagenUrl)
+        tvNombreRuta.text = ruta.nombre
+        tvDistanciaRuta.text = ruta.distancia.toString()
+        tvDistanciaInfoData.text = ruta.distancia.toString()
+        tvDificultadInfoData.text = ruta.dificultad
+        tvTipoRecorridonfoData.text = ruta.tipoRecorrido
+        var cadena = ""
+        for (tramo in tramos){
+            cadena += tramo.descripcion + "\n"
+        }
+        tvDescipcionInfoData.text = cadena
+
+
+
+
+        //Listeners
+        val atras = view.findViewById<Button>(R.id.favoriteImageAtras)
+        atras.setOnClickListener { findNavController().popBackStack() }
+
+
+
+        //Eliminar
+        val favoritos = view.findViewById<Button>(R.id.favoriteImageButtonDetalles)
+        favoritos.setOnClickListener {
+
+
+        }
+
     }
 }

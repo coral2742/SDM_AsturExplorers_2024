@@ -2,12 +2,13 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/navigation"
+    android:id="@+id/actionNavigationRutasToDetallesRuta"
+    android:label="a"
     app:startDestination="@id/navigation_rutas">
 
 
     <fragment
-        android:id="@+id/navigation_rutas"
+        android:id="@+id/navigation_fragment"
         android:name="sdm.com.asturexplorers.RutasFragment"
         android:label="fragment_rutas"
         tools:layout="@layout/fragment_rutas">
@@ -37,10 +38,14 @@
     <fragment
         android:id="@+id/rutasDetalle"
         android:name="sdm.com.asturexplorers.RutasDetalle"
-        android:label="fragment_rutas_detalle"
-        tools:layout="@layout/fragment_rutas_detalle" />
-
-
+        android:label="fragment_rutas_detalle">
+        <argument
+            android:name="Ruta"
+            app:argType="sdm.com.asturexplorers.db.Ruta" />
+        <argument
+            android:name="Tramos"
+            app:argType="sdm.com.asturexplorers.db.Tramo[]" />
+    </fragment>
 
 
 </navigation>

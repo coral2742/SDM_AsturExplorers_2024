@@ -12,6 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,9 +24,11 @@ class FavoritosFragment : Fragment() {
     private lateinit var tvWelcomeMessage: TextView
     private lateinit var btnIniciarSesion: Button
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RutasAdapter
+    private lateinit var adapter: RutasFavAdapter
     private val rutasFavoritas = mutableListOf<Ruta>()
     private val db = FirebaseFirestore.getInstance()
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +59,33 @@ class FavoritosFragment : Fragment() {
         fun newInstance(): FavoritosFragment = FavoritosFragment()
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        inicializar()
+    }
+
+    private fun inicializar() {
+        recyclerView = requireView().findViewById(R.id.recyclerFavoritos)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        //val json = requireContext().assets.open("rutas.json").bufferedReader().use { it.readText() }
+
+        //val (rutas, tramos) = jsonParser.parseRutas(json)
+
+        //this.rutas.addAll(rutas)
+        //this.tramos.addAll(tramos)
+
+        // Añadir las rutas a Firebase por primera vez
+        //subirRutasAFirebase(rutas)
+
+        setupUI();
+
+
+        //recyclerView.adapter = RutasAdapter(rutas)
+    }
+
+
+
     private fun setupUI() {
         val currentUser = SessionManager.currentUser
 
@@ -81,7 +112,7 @@ class FavoritosFragment : Fragment() {
             .document(userId)
             .get()
             .addOnSuccessListener { document ->
-                val favoritas = document.get("favoritas") as? List<String> ?: emptyList()
+                val favoritas = document.get("favoritas") as? List<Int> ?: emptyList()
                 if (favoritas.isNotEmpty()) {
                     // Cargar los detalles de las rutas favoritas
                     obtenerDetallesRutasFavoritas(favoritas)
@@ -96,47 +127,108 @@ class FavoritosFragment : Fragment() {
             }
     }
 
-    private fun obtenerDetallesRutasFavoritas(favoritas: List<String>) {
-        // Recuperar las rutas favoritas de la base de datos 'rutas'
-        db.collection("rutas")
-            .whereIn("nombre", favoritas) // Suponiendo que 'nombre' es el campo que almacena el nombre de la ruta
-            .get()
-            .addOnSuccessListener { result ->
-                rutasFavoritas.clear() // Limpiar la lista de rutas previas
-                for (document in result) {
-                    val ruta = document.toObject(Ruta::class.java) // Asumimos que Ruta es el modelo de datos para las rutas
-                    rutasFavoritas.add(ruta) // Añadimos la ruta a la lista de favoritas
-                }
+    private fun obtenerDetallesRutasFavoritas(favoritas: List<Int>) {
+        val rutasFavoritas = mutableListOf<Ruta>()  // Lista para almacenar las rutas favoritas recuperadas
 
-                Log.w("FavoritosFragment", "Rutas favoritas listas ${rutasFavoritas}")
+        // Recorremos la lista de IDs de rutas favoritas
+        for (rutaId in favoritas) {
+            getRutaById(rutaId,
+                onSuccess = { ruta ->
+                    ruta?.let {
+                        Log.d("RutasFragment", "Ruta encontrada: imagen -> ${ruta.imagenUrl} <-")
+                        rutasFavoritas.add(ruta)  // Agregamos la ruta a la lista de favoritas
 
-                // Actualizamos el RecyclerView con las rutas favoritas en el hilo principal
-                lifecycleScope.launch(Dispatchers.Main) {
-                    recyclerView.adapter = RutasAdapter(
-                        rutasFavoritas,
-                        onFavoriteClick = { ruta ->
-                            onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
-                        },
-                        onClickListener = { ruta ->
-                            // Manejo del clic en un elemento de la lista
-                            if (ruta != null){
-                                val tramosArray = Array<Tramo>(1) { Tramo(0, ruta.id, 10.0, "", "\"value\": \"<p style=\\\"text-align: justify;\\\">La ruta da comienzo en O Teixo (Taramundi), entre las cumbres del Ouroso y el Busnovo. En las inmediaciones del albergue se emprende el camino por la carretera que va hacia Santa Mariña. En las últimas casas de O Teixo se toma a la derecha una pista, hasta encontrar un cruce en el que cogemos el desvío de la izquierda y que discurre por debajo de la carretera. Cuando llegamos a un \\u2018castañéu', la pista se transforma en una senda que lo atraviesa hasta el pueblo de Santa Mariña, ejemplo de arquitectura rural del occidente asturiano, con los característicos volúmenes herméticos, muros de mampostería con piedra vista y cubierta de pizarra.<\\/p>\\n\\n<p style=\\\"text-align: justify;\\\">Desde Santa Mariña continuamos por la carretera que sale a la derecha y se dirige hacia otro ejemplo de la arquitectura rural, y desde aquí nuestro camino se encarama en lo alto de las crestas donde encontramos una pista que continúa hacia la izquierda, entre una zona de brezales y, que nos conduce hacia el caserío de Os Armallos.<\\/p>\\n\\n<p style=\\\"text-align: justify;\\\">Aquí el camino gira a la derecha, para descender entre prados y castañales hasta la carretera que une Taramundi con As Veigas, y desde ésta por un sendero hacia el conjunto etnográfico de Os Teixóis, perfecto ejemplo de lo que en el siglo XVIII fue una próspera industria en todo el Occidente de Asturias. Os Teixóis reúne toda una serie de ingenios movidos por agua: un molino, el mazo de una ferrería, un batán para el tratamiento de la lana, piedras de afilar y una primitiva central eléctrica.<\\/p>\\n\\n<p style=\\\"text-align: justify;\\\">Una vez visitado el conjunto, nos dirigimos hacia la cercana aldea de As Mestas por un sendero que transcurre al lado del arroyo. Ignoramos los cuatro primeros cruces que encontramos, para posteriormente coger el siguiente a la derecha, que nos conducirá a una pista que tomamos a la derecha.<\\/p>\\n\\n<p style=\\\"text-align: justify;\\\">Por el camino encontraremos las aún identificables \\u2018carboeiras' que, alimentadas con el abundante roble de la zona, producían el carbón vegetal consumido en las antaño numerosas ferrerías. Una vez en As Mestas tomamos la pista que lo une con O Teixo.<\\/p>\"\n") }  // Suponiendo que Tramo tiene un constructor sin parámetros
-                                val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
-                                    tramosArray
-                                )
-                                findNavController().navigate(destino)
-                            }
+                        // Verificamos si ya hemos agregado todas las rutas favoritas
+                        if (rutasFavoritas.size == favoritas.size) {
+                            // Aquí podemos actualizar el RecyclerView con la lista completa de rutas
+
+
+                            recyclerView.adapter = RutasFavAdapter(
+                                rutasFavoritas,
+                                onFavoriteClick = { ruta ->
+                                    onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
+                                },
+                                onClickListener = { ruta ->
+                                    // Manejo del clic en un elemento de la lista
+                                    //if (ruta != null){
+                                        //val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
+                                        //val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
+                                        //    tramosArray.toTypedArray()
+                                        //)
+                                        //findNavController().navigate(destino)
+                                   // }
+
+                                    Log.d("Ruta", "Clic on ruta");
+                                }
+                            )
                         }
-                    )
-                    recyclerView.adapter = adapter
+                    } ?: run {
+                        Log.d("RutasFragment", "No se encontró la ruta con el ID: $rutaId")
+                    }
+                },
+                onFailure = { exception ->
+                    Log.e("RutasFragment", "Error al buscar la ruta con ID: $rutaId", exception)
+                }
+            )
+        }
+
+
+
+    }
+
+
+    private fun getRutaById(rutaId: Int, onSuccess: (Ruta?) -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("rutas")
+            .whereEqualTo("id", rutaId)  // Filtrar por el campo "id" dentro del documento
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    // Si existe al menos un documento que cumple con la condición
+                    val ruta = querySnapshot.documents.firstOrNull()?.toObject(Ruta::class.java)
+                    onSuccess(ruta)
+                } else {
+                    // No se encontró ningún documento con ese "id"
+                    onSuccess(null)
                 }
             }
-            .addOnFailureListener { e ->
-                Log.e("FavoritosFragment", "Error al obtener detalles de las rutas", e)
+            .addOnFailureListener { exception ->
+                onFailure(exception)
             }
     }
+
+
+
+
+
+
 
     private fun onFavoritoClicked(ruta: Ruta) {
-        Log.w("FavoritosFragment", "Ruta seleccionada: ${ruta.nombre}")
+        val currentUser = SessionManager.currentUser
+        Log.d("RutasFragment", "Ruta encontrada: imagen -> ${ruta.imagenUrl} <-")
+        if (currentUser != null) {
+            Log.w("FavoritosFragment", "Ruta seleccionada para eliminar: ${ruta.nombre}")
+
+            // Eliminar la ruta de la colección "favoritas" del usuario
+            db.collection("rutas_favs")
+                .document(currentUser.uid)
+                .update("favoritas", FieldValue.arrayRemove(ruta.id))
+                .addOnSuccessListener {
+                    // Mostrar mensaje de SnackBar indicando que se ha eliminado de favoritos
+                    Snackbar.make(requireView(), "Ruta eliminada de favoritos", Snackbar.LENGTH_SHORT).show()
+                    Log.w("FavoritosFragment", "Ruta eliminada de favoritos ${ruta.nombre}")
+
+                    // Volver a cargar las rutas favoritas después de la eliminación
+                    setupUI()  // Esto recarga las rutas favoritas en la UI
+                }
+                .addOnFailureListener { e ->
+                    // Si hay algún error al eliminar, mostrar mensaje de error
+                    Snackbar.make(requireView(), "Error al eliminar la ruta de favoritos", Snackbar.LENGTH_SHORT).show()
+                    Log.w("FavoritosFragment", "Error al eliminar ruta de favoritos", e)
+                }
+        } else {
+            Log.w("FavoritosFragment", "Usuario no autenticado")
+        }
     }
+
+
 }

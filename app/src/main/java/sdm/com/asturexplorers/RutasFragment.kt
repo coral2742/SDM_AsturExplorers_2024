@@ -24,7 +24,6 @@ import sdm.com.asturexplorers.json.JsonParser
 class RutasFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RutasAdapter
     private var dbRutas: RutasDatabase? = null
     private val rutas = mutableListOf<Ruta>()
     private val tramos = mutableListOf<Tramo>()
@@ -77,7 +76,7 @@ class RutasFragment : Fragment() {
             onClickListener = { ruta ->
                 // Manejo del clic en un elemento de la lista
                 if (ruta != null){
-                    val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id   }
+                    val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
                     val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
                         tramosArray.toTypedArray()
                     )
@@ -101,7 +100,7 @@ class RutasFragment : Fragment() {
             // Añadir la ruta a la colección "favoritos" del usuario
             db.collection("rutas_favs")
                 .document(user.uid)
-                .update("favoritas", FieldValue.arrayUnion(ruta.nombre))
+                .update("favoritas", FieldValue.arrayUnion(ruta.id))
                 .addOnSuccessListener {
                     // Mostrar mensaje de SnackBar indicando que se ha añadido a favoritos
                     Snackbar.make(requireView(), "Ruta añadida a favoritos", Snackbar.LENGTH_SHORT).show()
@@ -124,6 +123,7 @@ class RutasFragment : Fragment() {
         // Iterar sobre la lista de rutas y subirlas a Firestore
         for (ruta in rutas) {
             val rutaData = hashMapOf(
+                "id" to ruta.id,
                 "nombre" to ruta.nombre,
                 "distancia" to ruta.distancia,
                 "dificultad" to ruta.dificultad,

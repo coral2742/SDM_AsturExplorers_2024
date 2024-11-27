@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Consejo")
         builder.setMessage("Comprueba el clima, planifica tu ruta y lleva suficiente agua.")
+        builder.setIcon(R.drawable.logo)
         builder.setPositiveButton("Más info") { _, _ ->
             val pdfUrl = "https://15f8034cdff6595cbfa1-1dd67c28d3aade9d3442ee99310d18bd.ssl.cf3.rackcdn.com/7202a309d373e716ec4e3d3dc959cbe4/Practica_montanismo_sin_miedo_pero_con_seguridad.pdf"
 

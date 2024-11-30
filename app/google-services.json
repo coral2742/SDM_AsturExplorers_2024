@@ -14,11 +14,27 @@
       },
       "oauth_client": [
         {
+          "client_id": "45836936990-13p3jo0lbfnucvt3titgll43s2h707tt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "sdm.com.asturexplorers",
+            "certificate_hash": "1c18b27111ad0b6e675534270ea67c4b284c3997"
+          }
+        },
+        {
           "client_id": "45836936990-da2parjff1vnlr1s501sa342inp0nbjb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "sdm.com.asturexplorers",
             "certificate_hash": "c7b7b674604ccfcef0108057835d74b76b69dbe2"
+          }
+        },
+        {
+          "client_id": "45836936990-l9pr5htchajlun3grh5f4h2rusec8us2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "sdm.com.asturexplorers",
+            "certificate_hash": "33b25b21448db6e7cf8ed77e6c1b37efafdb9e97"
           }
         },
         {

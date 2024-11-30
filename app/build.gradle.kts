@@ -84,6 +84,10 @@ dependencies {
     //Import OSM dependency
     implementation(libs.osmdroid.android)
 
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+
+
 
 
 }

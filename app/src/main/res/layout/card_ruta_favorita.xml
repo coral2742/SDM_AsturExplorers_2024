@@ -39,18 +39,14 @@
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
-                <ImageButton
-                    android:id="@+id/favoriteImageButton"
-                    android:layout_width="60dp"
+                <Button
+                    android:id="@+id/deleteFavButton"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:contentDescription="Favorito"
-                    android:src="@android:drawable/btn_star_big_off"
-                    android:padding="8dp"
-                    android:backgroundTint="@color/green"
-                    android:background="@drawable/rounded_star"
-                    />
-
-
+                    android:layout_weight="1"
+                    android:background="#811400"
+                    android:text="Quitar de favoritos"
+                    android:visibility="visible" />
 
 
             </LinearLayout>

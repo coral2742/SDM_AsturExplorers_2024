@@ -53,11 +53,11 @@
     <RelativeLayout
         android:id="@+id/mapLayout"
         android:layout_width="420dp"
-        android:layout_height="633dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
+        app:layout_constraintTop_toBottomOf="@+id/txtNombre">
 
         <org.osmdroid.views.MapView
             android:id="@+id/map"

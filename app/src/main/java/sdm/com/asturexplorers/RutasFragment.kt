@@ -6,13 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
@@ -26,7 +24,6 @@ import sdm.com.asturexplorers.json.JsonParser
 class RutasFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RutasAdapter
     private var dbRutas: RutasDatabase? = null
     private val rutas = mutableListOf<Ruta>()
     private val tramos = mutableListOf<Tramo>()
@@ -71,17 +68,22 @@ class RutasFragment : Fragment() {
         // Añadir las rutas a Firebase por primera vez
         //subirRutasAFirebase(rutas)
 
-        recyclerView.adapter = RutasAdapter(rutas) { ruta ->
-            val tramosArray = tramos
-                .filter { tramo -> tramo.rutaId == ruta.id }
-
-            val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
-                tramosArray.toTypedArray()
-            )
-            findNavController().navigate(destino)
-            onFavoritoClicked(ruta)
-        }
-
+        recyclerView.adapter = RutasAdapter(
+            rutas,
+            onFavoriteClick = { ruta ->
+                onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
+            },
+            onClickListener = { ruta ->
+                // Manejo del clic en un elemento de la lista
+                if (ruta != null){
+                    val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
+                    val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
+                        tramosArray.toTypedArray()
+                    )
+                    findNavController().navigate(destino)
+                }
+            }
+        )
         //recyclerView.adapter = RutasAdapter(rutas)
     }
 
@@ -98,7 +100,7 @@ class RutasFragment : Fragment() {
             // Añadir la ruta a la colección "favoritos" del usuario
             db.collection("rutas_favs")
                 .document(user.uid)
-                .update("favoritas", FieldValue.arrayUnion(ruta.nombre))
+                .update("favoritas", FieldValue.arrayUnion(ruta.id))
                 .addOnSuccessListener {
                     // Mostrar mensaje de SnackBar indicando que se ha añadido a favoritos
                     Snackbar.make(requireView(), "Ruta añadida a favoritos", Snackbar.LENGTH_SHORT).show()
@@ -121,6 +123,7 @@ class RutasFragment : Fragment() {
         // Iterar sobre la lista de rutas y subirlas a Firestore
         for (ruta in rutas) {
             val rutaData = hashMapOf(
+                "id" to ruta.id,
                 "nombre" to ruta.nombre,
                 "distancia" to ruta.distancia,
                 "dificultad" to ruta.dificultad,

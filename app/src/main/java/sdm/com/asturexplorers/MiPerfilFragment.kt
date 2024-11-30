@@ -221,8 +221,10 @@ class MiPerfilFragment : Fragment() {
         // Mostrar campos de email y contraseña
         inputEmail.visibility = View.VISIBLE
         inputPassword.visibility = View.VISIBLE
+        inputRepePassword.visibility = View.VISIBLE
         inputEmail.text.clear()
         inputPassword.text.clear()
+        inputRepePassword.text.clear()
         txtOlvidarPass.visibility = View.GONE
         txtNoTienes.visibility = View.GONE
         txtRegistraAqui.visibility = View.GONE
@@ -344,6 +346,7 @@ class MiPerfilFragment : Fragment() {
             btnLogin.visibility = View.GONE
             inputEmail.visibility = View.GONE
             inputPassword.visibility = View.GONE
+            inputRepePassword.visibility = View.GONE
 
             txtOlvidarPass.visibility = View.GONE
             txtNoTienes.visibility = View.GONE

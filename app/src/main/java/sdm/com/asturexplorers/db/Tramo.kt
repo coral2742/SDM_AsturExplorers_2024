@@ -12,7 +12,7 @@ data class Tramo(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     @ColumnInfo(name = "ruta_id")
-    val rutaId: Int, // ID de la ruta a la que pertenece
+    val rutaId: Int,
     val distancia: Double,
     @ColumnInfo(name = "origen_destino")
     val origenDestino: String,

@@ -25,4 +25,7 @@ interface RutaDao {
     @Delete
     suspend fun remove(ruta: Ruta)
 
+    @Query("DELETE FROM rutas")
+    suspend fun deleteAllRutas()
+
 }

@@ -24,6 +24,7 @@ class RutasDetalle : Fragment() {
     private lateinit var tvDificultadInfoData: TextView
     private lateinit var tvTipoRecorridonfoData: TextView
     private lateinit var tvDescipcionInfoData: TextView
+    private lateinit var tvDesnivelData: TextView
 
     private lateinit var ruta : Ruta
     private lateinit var tramos : Array<Tramo>
@@ -51,6 +52,7 @@ class RutasDetalle : Fragment() {
         tvDificultadInfoData = view.findViewById(R.id.tvDificultadInfoData)
         tvTipoRecorridonfoData = view.findViewById(R.id.tvTipoRecorridoInfoData)
         tvDescipcionInfoData = view.findViewById(R.id.tvDescripcionInfoData)
+        tvDesnivelData = view.findViewById(R.id.tvDesnivelData)
 
         ruta = args.ruta
         tramos = args.tramos
@@ -60,10 +62,11 @@ class RutasDetalle : Fragment() {
         tvDistanciaInfoData.text = ruta.distancia.toString() + " Km"
         tvDificultadInfoData.text = ruta.dificultad
         tvTipoRecorridonfoData.text = ruta.tipoRecorrido
+        tvDesnivelData.text = ruta.desnivel.toString() + " m"
         var cadena = ""
         for (tramo in tramos){
             val descripcionHtml = tramo.descripcion
-            val descripcionTextoPlano = HtmlCompat.fromHtml(descripcionHtml,
+            val descripcionTextoPlano = HtmlCompat.fromHtml(descripcionHtml.toString(),
                 HtmlCompat.FROM_HTML_MODE_LEGACY
             ).toString()
             cadena += descripcionTextoPlano + "\n"

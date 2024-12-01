@@ -59,6 +59,26 @@ class JsonParser(private val gson: Gson) {
         } else {
             1
         }
+        val desnivel = article.getAsJsonObject("Contacto").getAsJsonObject("Desnivel")
+        var desnivelContent = 0
+
+        if (desnivel.has("content")) {
+            val content = desnivel.get("content")
+
+            desnivelContent = if (content.isJsonPrimitive) {
+                val primitive = content.asJsonPrimitive
+                when {
+                    primitive.isNumber -> primitive.asInt // Es un número directamente
+                    primitive.isString -> {
+                        val regex = Regex("\\d+")
+                        regex.find(primitive.asString)?.value?.toIntOrNull() ?: 0
+                    }
+                    else -> 0
+                }
+            } else {
+                0 // No es un JsonPrimitive
+            }
+        }
         val tipoRecorrido = article.getAsJsonObject("TipoRuta").get("content").asString
         val slideElement = article.getAsJsonObject("Visualizador").takeIf { it.has("Slide") }?.get("Slide")
         val imageJson = slideElement?.let { procesarImagen(it) }
@@ -76,19 +96,47 @@ class JsonParser(private val gson: Gson) {
             // Construir la URL de la imagen
             imagenUrl =
                 "https://www.turismoasturias.es/documents/$groupId/$classPK/$title/$uuid"
+
+        }
+
+
+
+        val trazadaJson = article.getAsJsonObject("TrazadoRuta").get("content")
+
+        var trazadaUrl = ""
+
+        if (trazadaJson != null && trazadaJson.isJsonNull && trazadaJson.isJsonPrimitive) {
+            // Si el contenido no es nulo y es un string válido
+            val trazadaJsonString = trazadaJson.asString
+
+            if (trazadaJsonString.isNotEmpty()) {
+                // Si el contenido no está vacío, procesamos el JSON
+                val trazadaJsonObject = gson.fromJson(trazadaJsonString, JsonObject::class.java)
+
+                // Obtener los valores necesarios para construir la URL de la imagen
+                val classPK = trazadaJsonObject.get("classPK").asInt
+                val groupId = trazadaJsonObject.get("groupId").asInt
+                val title = trazadaJsonObject.get("title").asString
+                val uuid = trazadaJsonObject.get("uuid").asString
+
+                // Construir la URL de la imagen
+                trazadaUrl = "https://www.turismoasturias.es/documents/$groupId/$classPK/$title/$uuid"
+            }
         }
         return Ruta(
             index,
-            nombre = nombre,
-            distancia = distancia,
+            nombre,
+            distancia,
             dificultad = when (dificultad) {
                 1 -> "Fácil"
                 2 -> "Moderada"
                 3 -> "Difícil"
                 else -> "Desconocida"
             },
-            tipoRecorrido = tipoRecorrido,
-            imagenUrl = imagenUrl
+            tipoRecorrido,
+            desnivelContent,
+            imagenUrl,
+            trazadaUrl
         )
     }
 
@@ -111,6 +159,11 @@ class JsonParser(private val gson: Gson) {
                 tramoDistancia = tipoTramo.asDouble
             }
         }
+        val origenDestino = tramoObject.getAsJsonObject("OrigenDestino")
+        var origrenDestinoContent = ""
+        if (origenDestino.has("content")){
+            origrenDestinoContent = origenDestino.get("content").asString
+        }
 
         val tramoDescripcionTipo = tramoObject.get("DescripcionTramo")
         var tramoDescripcion = ""
@@ -126,7 +179,7 @@ class JsonParser(private val gson: Gson) {
         return Tramo(
             rutaId = rutaId,
             distancia = tramoDistancia,
-            origenDestino = "",
+            origenDestino = origrenDestinoContent,
             descripcion = tramoDescripcion
         )
     }

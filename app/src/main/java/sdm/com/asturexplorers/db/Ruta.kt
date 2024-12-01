@@ -14,9 +14,9 @@ data class Ruta(
     val nombre: String,
     val distancia: Double,
     val dificultad: String,
-    @ColumnInfo(name = "tipo_recorrido")
+    @ColumnInfo(name = "tipoRecorrido")
     val tipoRecorrido: String,
-    @ColumnInfo(name = "image_url")
+    @ColumnInfo(name = "imagenUrl")
     val imagenUrl: String
 ): Parcelable {
     constructor() : this(0, "", 0.0, "", "", "")

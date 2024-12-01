@@ -78,7 +78,7 @@ class FavoritosFragment : Fragment() {
         // Añadir las rutas a Firebase por primera vez
         //subirRutasAFirebase(rutas)
 
-        setupUI();
+        //setupUI();
 
 
         //recyclerView.adapter = RutasAdapter(rutas)
@@ -118,6 +118,7 @@ class FavoritosFragment : Fragment() {
                     obtenerDetallesRutasFavoritas(favoritas)
                 } else {
                     tvWelcomeMessage.text = "No tienes rutas favoritas aún."
+                    recyclerView.visibility = View.GONE
                 }
 
                 Log.w("FavoritosFragment", "Rutas favoritas cargadas ${favoritas}")
@@ -185,6 +186,7 @@ class FavoritosFragment : Fragment() {
                 if (!querySnapshot.isEmpty) {
                     // Si existe al menos un documento que cumple con la condición
                     val ruta = querySnapshot.documents.firstOrNull()?.toObject(Ruta::class.java)
+                    Log.d("RutasFragment", "Ruta encontrada: -> ${ruta} <-")
                     onSuccess(ruta)
                 } else {
                     // No se encontró ningún documento con ese "id"
@@ -213,18 +215,22 @@ class FavoritosFragment : Fragment() {
                 .document(currentUser.uid)
                 .update("favoritas", FieldValue.arrayRemove(ruta.id))
                 .addOnSuccessListener {
+                    setupUI()  // Esto recarga las rutas favoritas en la UI
                     // Mostrar mensaje de SnackBar indicando que se ha eliminado de favoritos
                     Snackbar.make(requireView(), "Ruta eliminada de favoritos", Snackbar.LENGTH_SHORT).show()
                     Log.w("FavoritosFragment", "Ruta eliminada de favoritos ${ruta.nombre}")
 
                     // Volver a cargar las rutas favoritas después de la eliminación
-                    setupUI()  // Esto recarga las rutas favoritas en la UI
+                    setupUI()
+
                 }
                 .addOnFailureListener { e ->
                     // Si hay algún error al eliminar, mostrar mensaje de error
                     Snackbar.make(requireView(), "Error al eliminar la ruta de favoritos", Snackbar.LENGTH_SHORT).show()
                     Log.w("FavoritosFragment", "Error al eliminar ruta de favoritos", e)
                 }
+
+
         } else {
             Log.w("FavoritosFragment", "Usuario no autenticado")
         }

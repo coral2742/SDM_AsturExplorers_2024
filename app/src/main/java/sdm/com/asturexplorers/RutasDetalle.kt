@@ -63,7 +63,7 @@ class RutasDetalle : Fragment() {
         var cadena = ""
         for (tramo in tramos){
             val descripcionHtml = tramo.descripcion
-            val descripcionTextoPlano = HtmlCompat.fromHtml(descripcionHtml,
+            val descripcionTextoPlano = HtmlCompat.fromHtml(descripcionHtml.toString(),
                 HtmlCompat.FROM_HTML_MODE_LEGACY
             ).toString()
             cadena += descripcionTextoPlano + "\n"

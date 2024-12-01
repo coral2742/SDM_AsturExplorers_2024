@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +15,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.RutasDatabase
@@ -25,7 +29,6 @@ class RutasFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private var dbRutas: RutasDatabase? = null
-    private val rutas = mutableListOf<Ruta>()
     private val tramos = mutableListOf<Tramo>()
     private lateinit var jsonParser: JsonParser
     private val db = FirebaseFirestore.getInstance()
@@ -58,32 +61,41 @@ class RutasFragment : Fragment() {
         recyclerView = requireView().findViewById(R.id.recycler)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val json = requireContext().assets.open("rutas.json").bufferedReader().use { it.readText() }
-
-        val (rutas, tramos) = jsonParser.parseRutas(json)
-
-        this.rutas.addAll(rutas)
-        this.tramos.addAll(tramos)
-
         // Añadir las rutas a Firebase por primera vez
         //subirRutasAFirebase(rutas)
 
-        recyclerView.adapter = RutasAdapter(
-            rutas,
-            onFavoriteClick = { ruta ->
-                onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
-            },
-            onClickListener = { ruta ->
-                // Manejo del clic en un elemento de la lista
-                if (ruta != null){
-                    val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
-                    val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
-                        tramosArray.toTypedArray()
-                    )
-                    findNavController().navigate(destino)
-                }
+        lifecycleScope.launch(Dispatchers.IO) {
+            var listaRutas = dbRutas!!.rutaDao.getAll()
+            //if (listaRutas.isEmpty()) {
+                val json = requireContext().assets.open("rutas.json").bufferedReader().use { it.readText() }
+
+                val (rutas, tramos) = jsonParser.parseRutas(json)
+                //dbRutas!!.rutaDao.insertAll(rutas)
+                //dbRutas!!.tramoDao.insertAll(tramos)
+                listaRutas = rutas
+            //}
+            withContext(Dispatchers.Main) {
+                recyclerView.adapter = RutasAdapter(
+                    listaRutas,
+                    onFavoriteClick = { ruta ->
+                        onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
+                    },
+                    onClickListener = { ruta ->
+                        // Manejo del clic en un elemento de la lista
+                        if (ruta != null){
+                            viewLifecycleOwner.lifecycleScope.launch{
+                                val tramosArray = dbRutas!!.tramoDao.getTramoById(ruta.id)
+                                val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
+                                    tramosArray.toTypedArray()
+                                )
+                                findNavController().navigate(destino)
+                            }
+
+                        }
+                    }
+                )
             }
-        )
+        }
         //recyclerView.adapter = RutasAdapter(rutas)
     }
 

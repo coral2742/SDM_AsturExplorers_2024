@@ -10,6 +10,9 @@ import androidx.room.Update
 @Dao
 interface TramoDao {
 
+    @Query("DELETE FROM tramos")
+    suspend fun deleteAllTramos()
+
     @Query("SELECT * FROM tramos")
     suspend fun getAll() : List<Tramo>
 

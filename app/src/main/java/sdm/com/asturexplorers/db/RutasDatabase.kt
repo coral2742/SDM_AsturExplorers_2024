@@ -8,7 +8,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 
-@Database(entities = [Ruta::class, Tramo::class], version = 2, exportSchema = false)
+@Database(entities = [Ruta::class, Tramo::class], version = 3, exportSchema = false)
 abstract class RutasDatabase : RoomDatabase(){
     abstract val rutaDao : RutaDao;
     abstract val tramoDao : TramoDao;

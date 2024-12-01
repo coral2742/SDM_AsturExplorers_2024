@@ -14,10 +14,10 @@ data class Ruta(
     val nombre: String,
     val distancia: Double,
     val dificultad: String,
-    @ColumnInfo(name = "tipo_recorrido")
+    @ColumnInfo(name = "tipoRecorrido")
     val tipoRecorrido: String,
     val desnivel: Int,
-    @ColumnInfo(name = "image_url")
+    @ColumnInfo(name = "imageUrl")
     val imagenUrl: String,
     val trazada: String
 )

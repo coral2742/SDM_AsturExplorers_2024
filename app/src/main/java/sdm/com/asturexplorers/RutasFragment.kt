@@ -66,14 +66,14 @@ class RutasFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             var listaRutas = dbRutas!!.rutaDao.getAll()
-            //if (listaRutas.isEmpty()) {
+            if (listaRutas.isEmpty()) {
                 val json = requireContext().assets.open("rutas.json").bufferedReader().use { it.readText() }
 
                 val (rutas, tramos) = jsonParser.parseRutas(json)
-                //dbRutas!!.rutaDao.insertAll(rutas)
-                //dbRutas!!.tramoDao.insertAll(tramos)
+                dbRutas!!.rutaDao.insertAll(rutas)
+                dbRutas!!.tramoDao.insertAll(tramos)
                 listaRutas = rutas
-            //}
+            }
             withContext(Dispatchers.Main) {
                 recyclerView.adapter = RutasAdapter(
                     listaRutas,

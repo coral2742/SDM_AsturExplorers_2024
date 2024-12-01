@@ -139,8 +139,8 @@ class RutasFragment : Fragment() {
                 "nombre" to ruta.nombre,
                 "distancia" to ruta.distancia,
                 "dificultad" to ruta.dificultad,
-                "tipo_recorrido" to ruta.tipoRecorrido,
-                "imagen_url" to ruta.imagenUrl
+                "tipoRecorrido" to ruta.tipoRecorrido,
+                "imagenUrl" to ruta.imagenUrl
             )
 
             // Crear un nuevo documento en la colección "rutas"

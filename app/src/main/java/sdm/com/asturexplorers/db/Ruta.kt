@@ -21,4 +21,6 @@ data class Ruta(
     val imagenUrl: String,
     val trazada: String
 )
-: Parcelable
+: Parcelable{
+    constructor() : this(0, "", 0.0, "", "", 0, "", "")
+}

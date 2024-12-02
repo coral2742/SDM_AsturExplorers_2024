@@ -102,10 +102,9 @@ class JsonParser(private val gson: Gson) {
 
 
         val trazadaJson = article.getAsJsonObject("TrazadoRuta").get("content")
-
         var trazadaUrl = ""
 
-        if (trazadaJson != null && trazadaJson.isJsonNull && trazadaJson.isJsonPrimitive) {
+        if (trazadaJson != null && trazadaJson.isJsonPrimitive) {
             // Si el contenido no es nulo y es un string válido
             val trazadaJsonString = trazadaJson.asString
 

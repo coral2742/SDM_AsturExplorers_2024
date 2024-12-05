@@ -16,6 +16,7 @@ import coil.load
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.Tramo
 
+
 class RutasDetalle : Fragment() {
     private lateinit var imagen: ImageView
     private lateinit var tvNombreRuta: TextView
@@ -82,6 +83,10 @@ class RutasDetalle : Fragment() {
 
         }
 
+    }
+
+    private fun mapaKML(){
+        
     }
 
 }

@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation("com.google.code.gson:gson:2.8.9")
     implementation(libs.firebase.firestore.ktx)
     val room_version = "2.6.1"
@@ -86,8 +85,7 @@ dependencies {
 
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-
-
+    implementation(name="osmbonuspack_6.9.0",group="org.osmdroid.bonuspack", ext="aar")
 
 
 }

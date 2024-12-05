@@ -28,4 +28,10 @@ interface RutaDao {
     @Query("DELETE FROM rutas")
     suspend fun deleteAllRutas()
 
+    @Query("SELECT * FROM rutas WHERE nombre LIKE '%' || :name || '%'")
+    suspend fun searchByName(name: String): List<Ruta>
+
+    @Query("SELECT * FROM rutas WHERE id IN (:ids) AND nombre LIKE '%' || :name || '%'")
+    suspend fun searchByNameAndId(ids: List<Int>,name: String): List<Ruta>
+
 }

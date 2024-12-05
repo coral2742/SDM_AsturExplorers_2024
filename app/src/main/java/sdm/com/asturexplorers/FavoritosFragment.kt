@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.SearchView
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -17,16 +18,19 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import sdm.com.asturexplorers.db.Ruta
-import sdm.com.asturexplorers.db.Tramo
+import sdm.com.asturexplorers.db.RutasDatabase
 
 class FavoritosFragment : Fragment() {
     private lateinit var tvWelcomeMessage: TextView
     private lateinit var btnIniciarSesion: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RutasFavAdapter
+    private lateinit var svRutas: SearchView
     private val rutasFavoritas = mutableListOf<Ruta>()
     private val db = FirebaseFirestore.getInstance()
+    private var dbRutas: RutasDatabase? = null
 
 
 
@@ -40,6 +44,10 @@ class FavoritosFragment : Fragment() {
         tvWelcomeMessage = view.findViewById(R.id.textWelcomeMessage)
         btnIniciarSesion = view.findViewById(R.id.btnIniciarSesion)
         recyclerView = view.findViewById(R.id.recyclerFavoritos)
+        svRutas = view.findViewById(R.id.svRutasFav)
+
+        dbRutas = RutasDatabase.getDB(requireContext())
+
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -62,6 +70,70 @@ class FavoritosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         inicializar()
+        buscador()
+    }
+
+    private fun buscador() {
+        val currentUser = SessionManager.currentUser
+        if (currentUser != null) {
+            svRutas.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    if (!newText.isNullOrEmpty()) {
+                        buscarRutasPorNombre(newText, currentUser.uid)
+                    } else {
+                        cargarRutasFavoritas(currentUser.uid)
+                    }
+                    return true
+                }
+            })
+        }
+
+    }
+
+    private fun buscarRutasPorNombre(newText: String, userId: String) {
+        db.collection("rutas_favs")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val favoritas = document.get("favoritas") as? List<Int> ?: emptyList()
+                if (favoritas.isNotEmpty()) {
+                    lifecycleScope.launch(Dispatchers.IO){
+                        val rutas = dbRutas!!.rutaDao.searchByNameAndId(favoritas, newText)
+
+                        withContext(Dispatchers.Main) {
+                            recyclerView.adapter = RutasFavAdapter(
+                                rutas,
+                                onFavoriteClick = { ruta -> onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
+                                },
+                                onClickListener = { ruta ->
+                                    // Manejo del clic en un elemento de la lista
+                                    //if (ruta != null){
+                                    //val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
+                                    //val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
+                                    //    tramosArray.toTypedArray()
+                                    //)
+                                    //findNavController().navigate(destino)
+                                    // }
+                                }
+                            )
+                        }
+                    }
+                } else {
+                    tvWelcomeMessage.text = "No tienes rutas favoritas aún."
+                    recyclerView.visibility = View.GONE
+                }
+
+                Log.w("FavoritosFragment", "Rutas favoritas cargadas ${favoritas}")
+            }
+            .addOnFailureListener { e ->
+                Log.e("FavoritosFragment", "Error al cargar las rutas favoritas", e)
+            }
     }
 
     private fun inicializar() {

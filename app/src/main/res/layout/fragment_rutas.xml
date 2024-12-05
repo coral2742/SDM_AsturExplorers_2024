@@ -42,25 +42,43 @@
         android:id="@+id/txtNombre"
         android:layout_width="273dp"
         android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="RUTAS"
         android:textColor="@color/black"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/svRutas" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtNombre" />
+
+    <SearchView
+        android:id="@+id/svRutas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="Buscar..."
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+
+    <Button
+        android:id="@+id/tbFiltros"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filtros"
+        app:layout_constraintTop_toTopOf="@id/svRutas"
+        app:layout_constraintStart_toEndOf="@id/svRutas" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

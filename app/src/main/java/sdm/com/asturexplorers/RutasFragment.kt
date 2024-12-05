@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 
@@ -21,7 +22,6 @@ import kotlinx.coroutines.withContext
 
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.RutasDatabase
-import sdm.com.asturexplorers.db.Tramo
 import sdm.com.asturexplorers.json.JsonParser
 
 
@@ -29,9 +29,9 @@ class RutasFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private var dbRutas: RutasDatabase? = null
-    private val tramos = mutableListOf<Tramo>()
     private lateinit var jsonParser: JsonParser
     private val db = FirebaseFirestore.getInstance()
+    private lateinit var svRutas: SearchView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +51,56 @@ class RutasFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         inicializar()
+        buscador()
+    }
+
+    private fun buscador() {
+        svRutas = requireView().findViewById(R.id.svRutas)
+
+        svRutas.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (!newText.isNullOrEmpty()) {
+                    buscarRutasPorNombre(newText)
+                } else {
+                    mostrarTodasLasRutas()
+                }
+                return true
+            }
+        })
+    }
+
+    private fun mostrarTodasLasRutas() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            // Si no hay búsqueda, muestra todas las rutas
+            val listaRutas = dbRutas!!.rutaDao.getAll()
+            withContext(Dispatchers.Main) {
+                // Actualiza el RecyclerView con todas las rutas
+                recyclerView.adapter = RutasAdapter(
+                    listaRutas,
+                    onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
+                    onClickListener = { ruta -> onClickedRuta(ruta) }
+                )
+            }
+        }
+    }
+
+    private fun buscarRutasPorNombre(name: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val rutasEncontradas = dbRutas!!.rutaDao.searchByName(name)
+
+            withContext(Dispatchers.Main) {
+                // Actualiza el RecyclerView con las rutas encontradas
+                recyclerView.adapter = RutasAdapter(
+                    rutasEncontradas,
+                    onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
+                    onClickListener = { ruta -> onClickedRuta(ruta) }
+                )
+            }
+        }
     }
 
     companion object {
@@ -77,26 +127,26 @@ class RutasFragment : Fragment() {
             withContext(Dispatchers.Main) {
                 recyclerView.adapter = RutasAdapter(
                     listaRutas,
-                    onFavoriteClick = { ruta ->
-                        onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
-                    },
-                    onClickListener = { ruta ->
-                        // Manejo del clic en un elemento de la lista
-                        if (ruta != null){
-                            viewLifecycleOwner.lifecycleScope.launch{
-                                val tramosArray = dbRutas!!.tramoDao.getTramoById(ruta.id)
-                                val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
-                                    tramosArray.toTypedArray()
-                                )
-                                findNavController().navigate(destino)
-                            }
-
-                        }
-                    }
+                    onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
+                    onClickListener = { ruta -> onClickedRuta(ruta) }
                 )
             }
         }
         //recyclerView.adapter = RutasAdapter(rutas)
+    }
+
+    private fun onClickedRuta(ruta: Ruta?) {
+        if (ruta != null) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val tramosArray = dbRutas!!.tramoDao.getTramoById(ruta.id)
+                val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(
+                    ruta,
+                    tramosArray.toTypedArray()
+                )
+                findNavController().navigate(destino)
+            }
+
+        }
     }
 
     // opción de añadir a favoritos

@@ -41,13 +41,13 @@
         android:id="@+id/txtNombre"
         android:layout_width="273dp"
         android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="FAVORITOS"
         android:textColor="@color/black"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/svRutasFav" />
 
     <TextView
         android:id="@+id/textWelcomeMessage"
@@ -57,8 +57,7 @@
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtNombre" />
-
+        app:layout_constraintTop_toBottomOf="@+id/svRutasFav" />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -66,7 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -82,6 +81,24 @@
         app:layout_constraintTop_toBottomOf="@+id/textWelcomeMessage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <SearchView
+        android:id="@+id/svRutasFav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="Buscar..."
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+
+    <Button
+        android:id="@+id/tbFiltros"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filtros"
+        app:layout_constraintTop_toTopOf="@id/svRutasFav"
+        app:layout_constraintStart_toEndOf="@id/svRutasFav" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

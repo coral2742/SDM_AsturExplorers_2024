@@ -83,9 +83,11 @@ dependencies {
     //Import OSM dependency
     implementation(libs.osmdroid.android)
 
+    implementation("com.github.MKergall:osmbonuspack:6.9.0")
+
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-    implementation(name="osmbonuspack_6.9.0",group="org.osmdroid.bonuspack", ext="aar")
+
 
 
 }

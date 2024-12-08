@@ -103,7 +103,7 @@ class RutasCercanasFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_rutas_cercanas, container, false)
-        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+        Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
         mapView = view.findViewById(R.id.map)
 
         mapView.setTileSource(TileSourceFactory.MAPNIK)

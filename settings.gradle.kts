@@ -9,8 +9,8 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        flatDir {
-            dirs(rootDir.absolutePath +"/libs")
+        maven {
+            url = uri("https://jitpack.io")
         }
     }
 }
@@ -19,8 +19,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        flatDir {
-            dirs(rootDir.absolutePath +"/libs")
+        maven {
+            url = uri("https://jitpack.io")
         }
     }
 }

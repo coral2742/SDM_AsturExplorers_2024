@@ -21,15 +21,18 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.osmdroid.bonuspack.kml.KmlDocument
 import org.osmdroid.config.Configuration
+import org.osmdroid.library.BuildConfig
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.library.BuildConfig
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.RutasDatabase
 import sdm.com.asturexplorers.json.JsonParser
+
 
 class RutasCercanasFragment : Fragment() {
     private lateinit var mapView: MapView
@@ -111,14 +114,11 @@ class RutasCercanasFragment : Fragment() {
         mapView.controller.setZoom(17)
         mapView.setMultiTouchControls(true)
 
-
-
-
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         // Verificar permisos y obtener ubicación
         obtenerUbicacionActual()
+
         return view
     }
 

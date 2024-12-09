@@ -2,6 +2,7 @@ package sdm.com.asturexplorers
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,9 +11,18 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.osmdroid.bonuspack.kml.KmlDocument
+import org.osmdroid.config.Configuration
+import org.osmdroid.library.BuildConfig
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.FolderOverlay
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.Tramo
 
@@ -31,6 +41,7 @@ class RutasDetalle : Fragment() {
     private lateinit var tramos : Array<Tramo>
 
     private val args : RutasDetalleArgs by this.navArgs()
+    private lateinit var mapView: MapView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +52,8 @@ class RutasDetalle : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_rutas_detalle, container, false)
+        val view =  inflater.inflate(R.layout.fragment_rutas_detalle, container, false)
+        return view
     }
 
     @SuppressLint("SetTextI18n")
@@ -83,10 +95,45 @@ class RutasDetalle : Fragment() {
 
         }
 
+        Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
+        mapView = view.findViewById(R.id.mapKml)
+
+        mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+
+        //mapView.controller.setZoom(10.0)
+        mapView.setMultiTouchControls(true)
+        lifecycleScope.launch(Dispatchers.IO) {
+            mapaKML()
+        }
     }
 
     private fun mapaKML(){
-        
+        //val document = KmlDocument()
+        //document.parseKMLUrl("https://mapsengine.google.com/map/kml?forcekml=1&mid=z6IJfj90QEd4.kUUY9FoHFRdE")
+        //val kmlOverlay = document.mKmlRoot.buildOverlay(mapView, null, null, document) as FolderOverlay
+        //mapView.overlays.add(kmlOverlay);
+        //mapView.invalidate();
+
+        //val bb = document.mKmlRoot.getBoundingBox()
+        //mapView.controller.setCenter(bb.getCenter());
+
+        try {
+            // Cargar el KML desde la URL
+            val document = KmlDocument()
+            document.parseKMLUrl("https://mapsengine.google.com/map/kml?forcekml=1&mid=z6IJfj90QEd4.kUUY9FoHFRdE")
+
+            // Verificar si se pudo cargar el archivo KML correctamente
+            if (document.mKmlRoot != null) {
+                val kmlOverlay = document.mKmlRoot.buildOverlay(mapView, null, null, document) as FolderOverlay
+                // Agregar el overlay al mapa
+                mapView.overlays.add(kmlOverlay)
+                mapView.invalidate()
+            } else {
+                Log.e("KML Error", "No se pudo procesar el archivo KML.")
+            }
+        } catch (e: Exception) {
+            Log.e("KML Error", "Error al cargar el archivo KML: ", e)
+        }
     }
 
 }

@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-
     implementation("com.google.code.gson:gson:2.8.9")
     implementation(libs.firebase.firestore.ktx)
     val room_version = "2.6.1"
@@ -84,11 +83,12 @@ dependencies {
     //Import OSM dependency
     implementation(libs.osmdroid.android)
 
+    implementation("com.github.MKergall:osmbonuspack:6.9.0")
+
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
 
     implementation("com.google.android.material:material:1.9.0")
-
 
 
 }

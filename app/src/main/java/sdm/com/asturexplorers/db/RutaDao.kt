@@ -28,10 +28,35 @@ interface RutaDao {
     @Query("DELETE FROM rutas")
     suspend fun deleteAllRutas()
 
-    @Query("SELECT * FROM rutas WHERE nombre LIKE '%' || :name || '%'")
-    suspend fun searchByName(name: String): List<Ruta>
+    @Query("""
+        SELECT * FROM rutas
+        WHERE distancia BETWEEN :minDistancia AND :maxDistancia
+        AND dificultad IN (:dificultades)
+        AND tipoRecorrido IN (:tiposRecorrido)
+        AND (:nombre IS NULL OR nombre LIKE '%' || :nombre || '%') 
+    """)
+    suspend fun filtrarYBuscarRutas(
+        minDistancia: Double,
+        maxDistancia: Double,
+        dificultades: MutableList<String>,
+        tiposRecorrido: MutableList<String>,
+        nombre: String?): List<Ruta>
 
-    @Query("SELECT * FROM rutas WHERE id IN (:ids) AND nombre LIKE '%' || :name || '%'")
-    suspend fun searchByNameAndId(ids: List<Int>,name: String): List<Ruta>
+    @Query("""
+        SELECT * FROM rutas
+        WHERE id IN (:ids)
+        AND distancia BETWEEN :minDistancia AND :maxDistancia
+        AND dificultad IN (:dificultades)
+        AND tipoRecorrido IN (:tiposRecorrido)
+        AND (:nombre IS NULL OR nombre LIKE '%' || :nombre || '%') 
+    """)
+    suspend fun filtrarYBuscarRutasPorIds(
+        ids: List<Int>,
+        minDistancia: Double,
+        maxDistancia: Double,
+        dificultades: MutableList<String>,
+        tiposRecorrido: MutableList<String>,
+        nombre: String?
+    ): List<Ruta>
 
 }

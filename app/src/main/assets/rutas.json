@@ -28233,7 +28233,7 @@
                 ]
             },
             {
-                "DistanciaTramo": {"title": "DistanciaTramo"},
+                "DistanciaTramo": {"title": "DistanciaDistanciaTramo"},
                 "TramoAlternativo": {"title": "TramoAlternativo"},
                 "title": "Tramos",
                 "OrigenDestino": {

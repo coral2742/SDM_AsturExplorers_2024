@@ -133,6 +133,8 @@ class JsonParser(private val gson: Gson) {
                 else -> "Desconocida"
             },
             tipoRecorrido = when(tipoRecorrido) {
+                "senderismo" -> "Senderismo"
+                "coche" -> "Coche"
                 "btt" -> "Bicicleta"
                 else -> tipoRecorrido
             },

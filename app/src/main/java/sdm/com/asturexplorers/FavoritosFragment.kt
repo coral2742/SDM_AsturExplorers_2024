@@ -1,5 +1,7 @@
 package sdm.com.asturexplorers
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +11,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SearchView
 import android.widget.TextView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,10 +33,13 @@ class FavoritosFragment : Fragment() {
     private lateinit var btnIniciarSesion: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RutasFavAdapter
+    private lateinit var filtros: Button
     private lateinit var svRutas: SearchView
     private val rutasFavoritas = mutableListOf<Ruta>()
     private val db = FirebaseFirestore.getInstance()
     private var dbRutas: RutasDatabase? = null
+    private lateinit var launcher: ActivityResultLauncher<Intent>
+
 
 
 
@@ -45,6 +54,7 @@ class FavoritosFragment : Fragment() {
         btnIniciarSesion = view.findViewById(R.id.btnIniciarSesion)
         recyclerView = view.findViewById(R.id.recyclerFavoritos)
         svRutas = view.findViewById(R.id.svRutasFav)
+        filtros = view.findViewById(R.id.btFiltrosFav)
 
         dbRutas = RutasDatabase.getDB(requireContext())
 
@@ -53,14 +63,89 @@ class FavoritosFragment : Fragment() {
 
         setupUI()
 
+
         btnIniciarSesion.setOnClickListener {
             // Redirigir al fragment de MiCuenta para iniciar sesión
             val navController = findNavController()
             navController.popBackStack(R.id.navigation_rutas, false)
             navController.navigate(R.id.navigation_mi_perfil)
         }
-
+        launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+                resultado -> procesarResultado(resultado)
+        }
+        filtros.setOnClickListener{
+            val intent = Intent(requireContext(), FiltrosActivity::class.java)
+            intent.putExtra("ventana", "favoritos")
+            launcher.launch(intent)
+        }
         return view
+    }
+
+    private fun procesarResultado(resultado: ActivityResult) {
+        if (resultado.resultCode == RESULT_OK){
+            aplicarFiltrosYBusqueda("")
+        } else{
+            setupUI()
+        }
+    }
+
+    private fun aplicarFiltrosYBusqueda(newText: String?) {
+        val currentUser = SessionManager.currentUser
+        if (currentUser != null) {
+            val sharedPreferences = requireContext().getSharedPreferences("favoritos", Context.MODE_PRIVATE)
+
+            // Obtener filtros
+            val minDistancia = sharedPreferences.getInt("minDistancia", 0).toDouble()
+            val maxDistancia = sharedPreferences.getInt("maxDistancia", 200).takeIf { it < 200 }?.toDouble() ?: Double.MAX_VALUE
+
+            val dificultades = mutableListOf<String>().apply {
+                if (sharedPreferences.getBoolean("facil", false)) add("Fácil")
+                if (sharedPreferences.getBoolean("moderado", false)) add("Moderada")
+                if (sharedPreferences.getBoolean("dificil", false)) add("Difícil")
+                if (isEmpty()) addAll(listOf("Fácil", "Moderada", "Difícil"))
+            }
+
+            val tiposRecorrido = mutableListOf<String>().apply {
+                if (sharedPreferences.getBoolean("pie", false)) add("Senderismo")
+                if (sharedPreferences.getBoolean("bicicleta", false)) add("Bicicleta")
+                if (sharedPreferences.getBoolean("coche", false)) add("Coche")
+                if (isEmpty()) addAll(listOf("Senderismo", "Bicicleta", "Coche"))
+            }
+                db.collection("rutas_favs")
+                    .document(currentUser.uid)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        val favoritas = (document.get("favoritas") as? List<*>)?.mapNotNull {
+                            (it as? Long)?.toInt()
+                        } ?: emptyList()
+                        if (favoritas.isNotEmpty()) {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                val rutasFiltradas = dbRutas!!.rutaDao.filtrarYBuscarRutasPorIds(
+                                    favoritas,
+                                    minDistancia,
+                                    maxDistancia,
+                                    dificultades,
+                                    tiposRecorrido,
+                                    newText ?: ""
+                                )
+                                withContext(Dispatchers.Main) {
+                                    actualizarRecyclerView(rutasFiltradas)
+                                }
+                            }
+                        }
+                    }
+
+        }
+    }
+
+    private fun actualizarRecyclerView(rutas: List<Ruta>) {
+            recyclerView.adapter = RutasFavAdapter(
+                rutas,
+                onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
+                onClickListener = { ruta ->
+                    //onClickedRuta(ruta)
+                }
+            )
     }
 
     companion object {
@@ -84,56 +169,11 @@ class FavoritosFragment : Fragment() {
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    if (!newText.isNullOrEmpty()) {
-                        buscarRutasPorNombre(newText, currentUser.uid)
-                    } else {
-                        cargarRutasFavoritas(currentUser.uid)
-                    }
+                    aplicarFiltrosYBusqueda(newText)
                     return true
                 }
             })
         }
-
-    }
-
-    private fun buscarRutasPorNombre(newText: String, userId: String) {
-        db.collection("rutas_favs")
-            .document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                val favoritas = document.get("favoritas") as? List<Int> ?: emptyList()
-                if (favoritas.isNotEmpty()) {
-                    lifecycleScope.launch(Dispatchers.IO){
-                        val rutas = dbRutas!!.rutaDao.searchByNameAndId(favoritas, newText)
-
-                        withContext(Dispatchers.Main) {
-                            recyclerView.adapter = RutasFavAdapter(
-                                rutas,
-                                onFavoriteClick = { ruta -> onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
-                                },
-                                onClickListener = { ruta ->
-                                    // Manejo del clic en un elemento de la lista
-                                    //if (ruta != null){
-                                    //val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
-                                    //val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
-                                    //    tramosArray.toTypedArray()
-                                    //)
-                                    //findNavController().navigate(destino)
-                                    // }
-                                }
-                            )
-                        }
-                    }
-                } else {
-                    tvWelcomeMessage.text = "No tienes rutas favoritas aún."
-                    recyclerView.visibility = View.GONE
-                }
-
-                Log.w("FavoritosFragment", "Rutas favoritas cargadas ${favoritas}")
-            }
-            .addOnFailureListener { e ->
-                Log.e("FavoritosFragment", "Error al cargar las rutas favoritas", e)
-            }
     }
 
     private fun inicializar() {
@@ -201,52 +241,7 @@ class FavoritosFragment : Fragment() {
     }
 
     private fun obtenerDetallesRutasFavoritas(favoritas: List<Int>) {
-        val rutasFavoritas = mutableListOf<Ruta>()  // Lista para almacenar las rutas favoritas recuperadas
-
-        // Recorremos la lista de IDs de rutas favoritas
-        for (rutaId in favoritas) {
-            getRutaById(rutaId,
-                onSuccess = { ruta ->
-                    ruta?.let {
-                        Log.d("RutasFragment", "Ruta encontrada: imagen -> ${ruta.imagenUrl} <-")
-                        rutasFavoritas.add(ruta)  // Agregamos la ruta a la lista de favoritas
-
-                        // Verificamos si ya hemos agregado todas las rutas favoritas
-                        if (rutasFavoritas.size == favoritas.size) {
-                            // Aquí podemos actualizar el RecyclerView con la lista completa de rutas
-
-
-                            recyclerView.adapter = RutasFavAdapter(
-                                rutasFavoritas,
-                                onFavoriteClick = { ruta ->
-                                    onFavoritoClicked(ruta) // Manejo del clic en el botón de favorito
-                                },
-                                onClickListener = { ruta ->
-                                    // Manejo del clic en un elemento de la lista
-                                    //if (ruta != null){
-                                        //val tramosArray = tramos.filter { tramo -> tramo.rutaId == ruta.id }
-                                        //val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(ruta,
-                                        //    tramosArray.toTypedArray()
-                                        //)
-                                        //findNavController().navigate(destino)
-                                   // }
-
-                                    Log.d("Ruta", "Clic on ruta");
-                                }
-                            )
-                        }
-                    } ?: run {
-                        Log.d("RutasFragment", "No se encontró la ruta con el ID: $rutaId")
-                    }
-                },
-                onFailure = { exception ->
-                    Log.e("RutasFragment", "Error al buscar la ruta con ID: $rutaId", exception)
-                }
-            )
-        }
-
-
-
+        aplicarFiltrosYBusqueda("")
     }
 
 
@@ -269,12 +264,6 @@ class FavoritosFragment : Fragment() {
                 onFailure(exception)
             }
     }
-
-
-
-
-
-
 
     private fun onFavoritoClicked(ruta: Ruta) {
         val currentUser = SessionManager.currentUser

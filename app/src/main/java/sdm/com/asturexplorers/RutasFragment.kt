@@ -1,12 +1,20 @@
 package sdm.com.asturexplorers
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.SearchView
+import android.widget.TextView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 
@@ -32,6 +40,9 @@ class RutasFragment : Fragment() {
     private lateinit var jsonParser: JsonParser
     private val db = FirebaseFirestore.getInstance()
     private lateinit var svRutas: SearchView
+    private lateinit var btFiltros: Button
+    private lateinit var launcher: ActivityResultLauncher<Intent>
+    private lateinit var tvNoHayRutas: TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,51 +62,83 @@ class RutasFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         inicializar()
-        buscador()
+        configurarBuscador()
     }
 
-    private fun buscador() {
+    private fun configurarBuscador() {
         svRutas = requireView().findViewById(R.id.svRutas)
 
         svRutas.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                return true
+                return true;
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (!newText.isNullOrEmpty()) {
-                    buscarRutasPorNombre(newText)
-                } else {
-                    mostrarTodasLasRutas()
-                }
+                aplicarFiltrosYBusqueda(newText)
                 return true
             }
         })
     }
 
-    private fun mostrarTodasLasRutas() {
+    private fun aplicarFiltrosYBusqueda(newText: String?) {
+        val sharedPreferences = requireContext().getSharedPreferences("principal", Context.MODE_PRIVATE)
+
+        // Obtener filtros
+        val minDistancia = sharedPreferences.getInt("minDistancia", 0).toDouble()
+        val maxDistancia = sharedPreferences.getInt("maxDistancia", 200).takeIf { it < 200 }?.toDouble() ?: Double.MAX_VALUE
+
+        val dificultades = mutableListOf<String>().apply {
+            if (sharedPreferences.getBoolean("facil", false)) add("Fácil")
+            if (sharedPreferences.getBoolean("moderado", false)) add("Moderada")
+            if (sharedPreferences.getBoolean("dificil", false)) add("Difícil")
+            if (isEmpty()) addAll(listOf("Fácil", "Moderada", "Difícil"))
+        }
+
+        val tiposRecorrido = mutableListOf<String>().apply {
+            if (sharedPreferences.getBoolean("pie", false)) add("Senderismo")
+            if (sharedPreferences.getBoolean("bicicleta", false)) add("Bicicleta")
+            if (sharedPreferences.getBoolean("coche", false)) add("Coche")
+            if (isEmpty()) addAll(listOf("Senderismo", "Bicicleta", "Coche"))
+        }
+
+        // Ejecutar la consulta con filtros y búsqueda
         lifecycleScope.launch(Dispatchers.IO) {
-            // Si no hay búsqueda, muestra todas las rutas
-            val listaRutas = dbRutas!!.rutaDao.getAll()
+            val rutasFiltradas = dbRutas!!.rutaDao.filtrarYBuscarRutas(
+                minDistancia,
+                maxDistancia,
+                dificultades,
+                tiposRecorrido,
+                newText ?: ""
+            )
             withContext(Dispatchers.Main) {
-                // Actualiza el RecyclerView con todas las rutas
-                recyclerView.adapter = RutasAdapter(
-                    listaRutas,
-                    onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
-                    onClickListener = { ruta -> onClickedRuta(ruta) }
-                )
+                actualizarRecyclerView(rutasFiltradas)
             }
         }
     }
 
-    private fun buscarRutasPorNombre(name: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val rutasEncontradas = dbRutas!!.rutaDao.searchByName(name)
+    private fun actualizarRecyclerView(rutas: List<Ruta>) {
+        if (rutas.isEmpty()){
+            tvNoHayRutas.visibility = View.VISIBLE
+            tvNoHayRutas.text = "No hay rutas"
+            recyclerView.visibility = View.GONE
+        } else{
+            tvNoHayRutas.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
+            recyclerView.adapter = RutasAdapter(
+                rutas,
+                onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
+                onClickListener = { ruta -> onClickedRuta(ruta) }
+            )
+        }
+    }
 
+
+    private fun mostrarTodasLasRutas() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val listaRutas = dbRutas!!.rutaDao.getAll()
             withContext(Dispatchers.Main) {
-                // Actualiza el RecyclerView con las rutas encontradas
                 recyclerView.adapter = RutasAdapter(
-                    rutasEncontradas,
+                    listaRutas,
                     onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
                     onClickListener = { ruta -> onClickedRuta(ruta) }
                 )
@@ -107,31 +150,43 @@ class RutasFragment : Fragment() {
         fun newInstance(): RutasFragment = RutasFragment()
     }
 
+    private fun procesarResultado(resultado: ActivityResult) {
+        if (resultado.resultCode == RESULT_OK){
+            aplicarFiltrosYBusqueda("")
+        } else{
+            mostrarTodasLasRutas()
+        }
+    }
+
     private fun inicializar() {
         recyclerView = requireView().findViewById(R.id.recycler)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        btFiltros = requireView().findViewById(R.id.btFiltros)
+        tvNoHayRutas = requireView().findViewById(R.id.tvNoHayRutas)
+        launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+                resultado -> procesarResultado(resultado)
+        }
+        btFiltros.setOnClickListener{
+            val intent = Intent(requireContext(), FiltrosActivity::class.java)
+            intent.putExtra("ventana", "principal")
+            launcher.launch(intent)
+        }
 
         // Añadir las rutas a Firebase por primera vez
         //subirRutasAFirebase(rutas)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            var listaRutas = dbRutas!!.rutaDao.getAll()
+            val listaRutas = dbRutas!!.rutaDao.getAll()
             if (listaRutas.isEmpty()) {
                 val json = requireContext().assets.open("rutas.json").bufferedReader().use { it.readText() }
 
                 val (rutas, tramos) = jsonParser.parseRutas(json)
                 dbRutas!!.rutaDao.insertAll(rutas)
                 dbRutas!!.tramoDao.insertAll(tramos)
-                listaRutas = rutas
             }
-            withContext(Dispatchers.Main) {
-                recyclerView.adapter = RutasAdapter(
-                    listaRutas,
-                    onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
-                    onClickListener = { ruta -> onClickedRuta(ruta) }
-                )
-            }
+            aplicarFiltrosYBusqueda("")
         }
+
         //recyclerView.adapter = RutasAdapter(rutas)
     }
 

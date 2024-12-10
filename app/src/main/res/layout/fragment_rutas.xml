@@ -23,7 +23,6 @@
             android:layout_height="100dp"
             android:layout_alignParentStart="true"
             android:contentDescription="Logo"
-            android:visibility="gone"
             android:scaleType="centerInside"
             app:srcCompat="@drawable/logo" />
 

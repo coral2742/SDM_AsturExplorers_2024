@@ -101,6 +101,9 @@ class RutasDetalle : Fragment() {
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
 
         //mapView.controller.setZoom(10.0)
+        mapView.controller.setZoom(15.0)
+        // Centrar el mapa en la Escuela de Ingeniería Informática
+        //mapView.controller.setCenter(org.osmdroid.util.GeoPoint(43.354702, -5.851346))
         mapView.setMultiTouchControls(true)
         lifecycleScope.launch(Dispatchers.IO) {
             mapaKML()
@@ -114,8 +117,6 @@ class RutasDetalle : Fragment() {
         //mapView.overlays.add(kmlOverlay);
         //mapView.invalidate();
 
-        //val bb = document.mKmlRoot.getBoundingBox()
-        //mapView.controller.setCenter(bb.getCenter());
 
         try {
             // Cargar el KML desde la URL
@@ -128,6 +129,13 @@ class RutasDetalle : Fragment() {
                 // Agregar el overlay al mapa
                 mapView.overlays.add(kmlOverlay)
                 mapView.invalidate()
+
+
+                val centerPoint = document.mKmlRoot.getBoundingBox().getCenter()
+                mapView.controller.setCenter(centerPoint)
+                mapView.controller.setZoom(0)
+
+
             } else {
                 Log.e("KML Error", "No se pudo procesar el archivo KML.")
             }

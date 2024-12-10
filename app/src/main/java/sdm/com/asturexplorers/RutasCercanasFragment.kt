@@ -91,7 +91,7 @@ class RutasCercanasFragment : Fragment() {
 
                 val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.marker)
                 val bitmap = (drawable as BitmapDrawable).bitmap
-                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 80, 90, false)
+                val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 40, 45, false)
                 marker.icon = BitmapDrawable(resources, scaledBitmap)
 
                 mapView.overlays.add(marker)

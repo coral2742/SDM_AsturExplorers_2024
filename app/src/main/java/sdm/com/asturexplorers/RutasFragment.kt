@@ -192,6 +192,7 @@ class RutasFragment : Fragment() {
 
     private fun onClickedRuta(ruta: Ruta?) {
         if (ruta != null) {
+
             viewLifecycleOwner.lifecycleScope.launch {
                 val tramosArray = dbRutas!!.tramoDao.getTramoById(ruta.id)
                 val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(

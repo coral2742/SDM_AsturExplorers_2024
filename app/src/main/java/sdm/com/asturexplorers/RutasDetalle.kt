@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.osmdroid.bonuspack.kml.KmlDocument
 import org.osmdroid.config.Configuration
@@ -105,6 +106,7 @@ class RutasDetalle : Fragment() {
         // Centrar el mapa en la Escuela de Ingeniería Informática
         //mapView.controller.setCenter(org.osmdroid.util.GeoPoint(43.354702, -5.851346))
         mapView.setMultiTouchControls(true)
+
         lifecycleScope.launch(Dispatchers.IO) {
             mapaKML()
         }
@@ -116,7 +118,6 @@ class RutasDetalle : Fragment() {
         //val kmlOverlay = document.mKmlRoot.buildOverlay(mapView, null, null, document) as FolderOverlay
         //mapView.overlays.add(kmlOverlay);
         //mapView.invalidate();
-
 
         try {
             // Cargar el KML desde la URL
@@ -130,10 +131,12 @@ class RutasDetalle : Fragment() {
                 mapView.overlays.add(kmlOverlay)
                 mapView.invalidate()
 
+                GlobalScope.launch(Dispatchers.Main) {
 
                 val centerPoint = document.mKmlRoot.getBoundingBox().getCenter()
                 mapView.controller.setCenter(centerPoint)
-                mapView.controller.setZoom(0)
+                //mapView.controller.setZoom(0)
+                    }
 
 
             } else {

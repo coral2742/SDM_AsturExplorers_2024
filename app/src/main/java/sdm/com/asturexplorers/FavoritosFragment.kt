@@ -39,6 +39,8 @@ class FavoritosFragment : Fragment() {
     private val db = FirebaseFirestore.getInstance()
     private var dbRutas: RutasDatabase? = null
     private lateinit var launcher: ActivityResultLauncher<Intent>
+    private lateinit var btnFiltros: Button
+    private lateinit var searchFiltro: SearchView
 
 
 
@@ -55,6 +57,8 @@ class FavoritosFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerFavoritos)
         svRutas = view.findViewById(R.id.svRutasFav)
         filtros = view.findViewById(R.id.btFiltrosFav)
+        btnFiltros = view.findViewById(R.id.btFiltrosFav)
+        searchFiltro = view.findViewById(R.id.svRutasFav)
 
         dbRutas = RutasDatabase.getDB(requireContext())
 
@@ -202,8 +206,10 @@ class FavoritosFragment : Fragment() {
         val currentUser = SessionManager.currentUser
 
         if (currentUser != null) {
-            tvWelcomeMessage.text = "¡Bienvenido, ${currentUser.displayName}!"
+            tvWelcomeMessage.text = "No tienes rutas favoritas"
             btnIniciarSesion.visibility = View.GONE
+            btnFiltros.visibility = View.VISIBLE
+            searchFiltro.visibility = View.VISIBLE
 
             Log.w("FavoritosFragment", "Cargando las rutas favoritas")
 
@@ -215,6 +221,8 @@ class FavoritosFragment : Fragment() {
         } else {
             tvWelcomeMessage.text = "Inicia sesión para ver tus rutas favoritas."
             btnIniciarSesion.visibility = View.VISIBLE
+            btnFiltros.visibility = View.GONE
+            searchFiltro.visibility = View.GONE
         }
     }
 

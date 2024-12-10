@@ -1,5 +1,6 @@
 package sdm.com.asturexplorers.json
 
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -122,6 +123,23 @@ class JsonParser(private val gson: Gson) {
                 trazadaUrl = "https://www.turismoasturias.es/documents/$groupId/$classPK/$title/$uuid"
             }
         }
+
+        val geolocalizacion = article.getAsJsonObject("Geolocalizacion")
+        var latitud = ""
+        var longitud = ""
+
+        if (geolocalizacion != null) {
+            val coordenadas = geolocalizacion.getAsJsonObject("Coordenadas").get("content")
+            if(coordenadas != null) {
+                Log.d("Geolocalizacion", coordenadas.asString)
+                val latLng = coordenadas.asString.split(",")
+                latitud = latLng[0]
+                longitud = latLng[1]
+            }
+        }
+
+
+
         return Ruta(
             index,
             nombre,
@@ -140,7 +158,9 @@ class JsonParser(private val gson: Gson) {
             },
             desnivelContent,
             imagenUrl,
-            trazadaUrl
+            trazadaUrl,
+            latitud,
+            longitud
         )
     }
 

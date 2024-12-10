@@ -19,8 +19,10 @@ data class Ruta(
     val desnivel: Int,
     @ColumnInfo(name = "imageUrl")
     val imagenUrl: String,
-    val trazada: String
+    val trazada: String,
+    val latitud: String,
+    val longitud: String
 )
 : Parcelable{
-    constructor() : this(0, "", 0.0, "", "", 0, "", "")
+    constructor() : this(0, "", 0.0, "", "", 0, "", "", "", "")
 }

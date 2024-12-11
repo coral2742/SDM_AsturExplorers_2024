@@ -113,18 +113,12 @@ class RutasDetalle : Fragment() {
     }
 
     private fun mapaKML(){
-        //val document = KmlDocument()
-        //document.parseKMLUrl("https://mapsengine.google.com/map/kml?forcekml=1&mid=z6IJfj90QEd4.kUUY9FoHFRdE")
-        //val kmlOverlay = document.mKmlRoot.buildOverlay(mapView, null, null, document) as FolderOverlay
-        //mapView.overlays.add(kmlOverlay);
-        //mapView.invalidate();
-
         try {
-            // Cargar el KML desde la URL
+            // Cargar KML de los datos de la ruta
             val document = KmlDocument()
-            document.parseKMLUrl("https://mapsengine.google.com/map/kml?forcekml=1&mid=z6IJfj90QEd4.kUUY9FoHFRdE")
+            document.parseKMLUrl(ruta.trazada)
 
-            // Verificar si se pudo cargar el archivo KML correctamente
+            // Verificar si el KML se ha cargado
             if (document.mKmlRoot != null) {
                 val kmlOverlay = document.mKmlRoot.buildOverlay(mapView, null, null, document) as FolderOverlay
                 // Agregar el overlay al mapa
@@ -132,11 +126,10 @@ class RutasDetalle : Fragment() {
                 mapView.invalidate()
 
                 GlobalScope.launch(Dispatchers.Main) {
-
-                val centerPoint = document.mKmlRoot.getBoundingBox().getCenter()
-                mapView.controller.setCenter(centerPoint)
-                //mapView.controller.setZoom(0)
-                    }
+                    val centerPoint = document.mKmlRoot.getBoundingBox().getCenter()
+                    mapView.controller.setCenter(centerPoint)
+                    //mapView.controller.setZoom(0)
+                }
 
 
             } else {

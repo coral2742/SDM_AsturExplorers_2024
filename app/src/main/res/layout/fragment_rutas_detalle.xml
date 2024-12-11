@@ -138,7 +138,7 @@
             <TextView
                 android:id="@+id/tvNombreRuta"
                 android:layout_width="378dp"
-                android:layout_height="52dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="40dp"
                 android:shadowColor="@color/black"

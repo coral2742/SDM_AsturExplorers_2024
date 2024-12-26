@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -72,34 +73,16 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
             }
             else{
-                Toast.makeText(this, "Usuario autenticado con usuario: ${user.email}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Hola de nuevo, ${user.displayName}", Toast.LENGTH_SHORT).show()
             }
         }
 
-        mostrarConsejos();
+        viewModel.mostrarConsejos(this);
 
 
     }
 
-    private fun mostrarConsejos(){
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Consejo")
-        builder.setMessage("Comprueba el clima, planifica tu ruta y lleva suficiente agua.")
-        builder.setIcon(R.drawable.logo)
-        builder.setPositiveButton("Más info") { _, _ ->
-            val pdfUrl = "https://15f8034cdff6595cbfa1-1dd67c28d3aade9d3442ee99310d18bd.ssl.cf3.rackcdn.com/7202a309d373e716ec4e3d3dc959cbe4/Practica_montanismo_sin_miedo_pero_con_seguridad.pdf"
 
-            // Abrir la guía PDF en el navegador
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl))
-            startActivity(intent)
-        }
-        builder.setNegativeButton("Cerrar") { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.show()
-
-
-    }
 
 
 }

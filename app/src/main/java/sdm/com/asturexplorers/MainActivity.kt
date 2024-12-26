@@ -10,6 +10,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -24,9 +25,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import sdm.com.asturexplorers.mvvm.MainViewModel
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
+    //private lateinit var auth: FirebaseAuth
+
+    private val viewModel: MainViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,11 +56,25 @@ class MainActivity : AppCompatActivity() {
         bottomNavView.setupWithNavController(navHostFragment)
 
 
+        /*
         setupWithNavController(bottomNavView, navHostFragment)
 
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
         SessionManager.currentUser = user
+
+         */
+
+        // Observar los cambios del usuario actual
+        viewModel.currentUser.observe(this) { user ->
+            SessionManager.currentUser = user
+            if (user == null) {
+                Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(this, "Usuario autenticado con usuario: ${user.email}", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         mostrarConsejos();
 

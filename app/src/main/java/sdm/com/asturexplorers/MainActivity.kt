@@ -29,9 +29,9 @@ import com.google.firebase.auth.FirebaseAuth
 import sdm.com.asturexplorers.mvvm.MainViewModel
 
 class MainActivity : AppCompatActivity() {
-    //private lateinit var auth: FirebaseAuth
 
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var bottomNavView: BottomNavigationView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,30 +52,9 @@ class MainActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
 
-        val bottomNavView = findViewById<BottomNavigationView>(R.id.navigationbtn)
+        bottomNavView = findViewById<BottomNavigationView>(R.id.navigationbtn)
         val navHostFragment = findNavController(R.id.fragmentContainerView)
         bottomNavView.setupWithNavController(navHostFragment)
-
-
-        /*
-        setupWithNavController(bottomNavView, navHostFragment)
-
-        auth = FirebaseAuth.getInstance()
-        val user = auth.currentUser
-        SessionManager.currentUser = user
-
-         */
-
-        // Observar los cambios del usuario actual
-        viewModel.currentUser.observe(this) { user ->
-            SessionManager.currentUser = user
-            if (user == null) {
-                Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
-            }
-            else{
-                Toast.makeText(this, "Hola de nuevo, ${user.displayName}", Toast.LENGTH_SHORT).show()
-            }
-        }
 
         viewModel.mostrarConsejos(this);
 

@@ -19,10 +19,6 @@ class MainViewModel : ViewModel() {
     private val _currentUser = MutableLiveData<FirebaseUser?>()
     val currentUser: LiveData<FirebaseUser?> get() = _currentUser
 
-    /**
-     * Muestra un diálogo de consejos. Necesita el contexto de la actividad
-     * para construir y mostrar el diálogo.
-     */
     fun mostrarConsejos(context: Context) {
         if (_mensajeMostrado.value == true) {
             return

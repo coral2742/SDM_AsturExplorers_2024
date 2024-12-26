@@ -1,5 +1,6 @@
 package sdm.com.asturexplorers
 
+import MiPerfilViewModel
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -11,7 +12,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import coil.load
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -19,11 +21,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 
 class MiPerfilFragment : Fragment() {
+    private val viewModel: MiPerfilViewModel by viewModels()
+
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 9001
@@ -61,6 +65,17 @@ class MiPerfilFragment : Fragment() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+
+
+        viewModel.currentUser.observe(this) { newUser ->
+            updateUI(newUser);
+        }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner, Observer { message ->
+            if (message != null) {
+                Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+            }
+        })
     }
 
     override fun onCreateView(
@@ -170,33 +185,17 @@ class MiPerfilFragment : Fragment() {
     }
 
     private fun signUpWithEmail(email: String, password: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    Snackbar.make(requireView(), "Sign-up successful!", Snackbar.LENGTH_SHORT).show()
-                    SessionManager.currentUser = user
-                    updateUI(user)
-                    // añadir usuario a Firebase de rutas favoritas (lista vacía)
-                    val userData = hashMapOf(
-                        "userId" to user?.uid,
-                        "favoritas" to listOf<String>()
-                    )
-                    val db = FirebaseFirestore.getInstance()
-                    db.collection("rutas_favs")
-                        .document(user?.uid ?: "")
-                        .set(userData)
-                        .addOnSuccessListener {
-                            Log.d("Firestore", "Usuario guardado exitosamente")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("Firestore", "Error al guardar los datos del usuario: $e")
-                        }
-                } else {
-                    Log.w("MiPerfilFragment", "createUserWithEmail:failure", task.exception)
-                    Snackbar.make(requireView(), "Error: No se pudo crear la cuenta", Snackbar.LENGTH_SHORT).show()
-                }
+        if (email.isEmpty() || password.isEmpty()) {
+            if (email.isEmpty()) {
+                inputEmail.error = "Por favor, introduce tu email"
             }
+            if (password.isEmpty()) {
+                inputPassword.error = "Por favor, introduce tu contraseña"
+            }
+            return
+        }
+
+        viewModel.signUpWithEmail(email, password)
     }
 
     // UI Crear cuenta
@@ -239,26 +238,18 @@ class MiPerfilFragment : Fragment() {
     }
 
     private fun sendPasswordResetEmail(email: String) {
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d("MiPerfilFragment", "Se ha enviado el correo de recuperación.")
-                    // Mostrar un mensaje de éxito o algo para que el usuario sepa que se envió el correo
-                    Snackbar.make(requireView(), "Se ha enviado el correo de recuperación.", Snackbar.LENGTH_SHORT).show()
-
-                } else {
-                    Log.w("MiPerfilFragment", "Error al enviar correo de recuperación.", task.exception)
-                    // Mostrar un mensaje de error si algo falla
-                    Snackbar.make(requireView(), "Error: No se ha podido enviar el correo de recuperación.", Snackbar.LENGTH_SHORT).show()
-                }
-            }
+        viewModel.sendPasswordResetEmail(email);
     }
 
     private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+        //val signInIntent = googleSignInClient.signInIntent
+        //startActivityForResult(signInIntent, RC_SIGN_IN)
+
+        viewModel.signInWithGoogle();
 
     }
+
+    /*
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -273,6 +264,8 @@ class MiPerfilFragment : Fragment() {
             }
         }
     }
+
+     */
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -403,27 +396,23 @@ class MiPerfilFragment : Fragment() {
             }
             return
         }
+        viewModel.signInWithEmail(email, password)
 
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    SessionManager.currentUser = user
-                    updateUI(user)
-                } else {
-                    Log.w("MiPerfilFragment", "signInWithEmail:failure", task.exception)
-                    Snackbar.make(requireView(), "No se ha podido iniciar sesión. Inténtalo de nuevo.", Snackbar.LENGTH_SHORT).show()
-                    updateUI(null)
-                }
+        // Observamos el LiveData para manejar la respuesta
+        viewModel.currentUser.observe(viewLifecycleOwner, Observer { user ->
+            if (user != null) {
+                SessionManager.currentUser = user
+                updateUI(user)
             }
+            else {
+                Snackbar.make(requireView(), "No se ha podido iniciar sesión. Inténtalo de nuevo.", Snackbar.LENGTH_SHORT).show()
+                updateUI(null)
+            }
+        })
     }
 
     private fun signOut() {
-        auth.signOut()
-        googleSignInClient.signOut().addOnCompleteListener(requireActivity()) {
-            SessionManager.currentUser = null
-            updateUI(null)
-        }
+        viewModel.signOut()
     }
 
     companion object {

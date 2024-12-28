@@ -62,6 +62,8 @@ class RutasAdapter(
             // acción de clic sobre estrella de favoritos
             favoriteImageButton.setOnClickListener {
                 rutaActual?.let { ruta ->
+                    val isSelected = favoriteImageButton.isSelected
+                    favoriteImageButton.isSelected = !isSelected
                     onFavoriteClick(ruta)
                 }
             }

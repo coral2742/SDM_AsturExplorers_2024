@@ -43,8 +43,9 @@
                     android:id="@+id/favoriteImageButton"
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
+
                     android:contentDescription="Favorito"
-                    android:src="@android:drawable/btn_star_big_off"
+                    android:src="@drawable/star_selector"
                     android:padding="8dp"
                     android:backgroundTint="@color/green"
                     android:background="@drawable/rounded_star"

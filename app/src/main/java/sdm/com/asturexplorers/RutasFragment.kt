@@ -14,7 +14,10 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 
@@ -31,6 +34,7 @@ import kotlinx.coroutines.withContext
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.RutasDatabase
 import sdm.com.asturexplorers.json.JsonParser
+import sdm.com.asturexplorers.mvvm.RutasViewModel
 
 
 class RutasFragment : Fragment() {
@@ -43,6 +47,8 @@ class RutasFragment : Fragment() {
     private lateinit var btFiltros: Button
     private lateinit var launcher: ActivityResultLauncher<Intent>
     private lateinit var tvNoHayRutas: TextView
+    private val viewModel: RutasViewModel by viewModels()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +69,20 @@ class RutasFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         inicializar()
         configurarBuscador()
+        viewModel.rutasLiveData.observe(viewLifecycleOwner, Observer { rutas ->
+            if (rutas.isEmpty()) {
+                tvNoHayRutas.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+            } else {
+                tvNoHayRutas.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                recyclerView.adapter = RutasAdapter(
+                    rutas,
+                    onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
+                    onClickListener = { ruta -> onClickedRuta(ruta) }
+                )
+            }
+        })
     }
 
     private fun configurarBuscador() {
@@ -179,12 +199,10 @@ class RutasFragment : Fragment() {
             val listaRutas = dbRutas!!.rutaDao.getAll()
             if (listaRutas.isEmpty()) {
                 val json = requireContext().assets.open("rutas.json").bufferedReader().use { it.readText() }
-
-                val (rutas, tramos) = jsonParser.parseRutas(json)
-                dbRutas!!.rutaDao.insertAll(rutas)
-                dbRutas!!.tramoDao.insertAll(tramos)
+                viewModel.cargarRutasIniciales(json)
+            } else {
+                viewModel.cargarRutasIniciales("")
             }
-            aplicarFiltrosYBusqueda("")
         }
 
         //recyclerView.adapter = RutasAdapter(rutas)

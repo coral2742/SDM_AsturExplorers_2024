@@ -5,18 +5,17 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
-import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -45,7 +44,9 @@ class RutasDetalle : Fragment() {
 
     private val args : RutasDetalleArgs by this.navArgs()
     private lateinit var mapView: MapView
-    private lateinit var scrollView: NestedScrollView
+
+
+    private lateinit var bottomNavView: BottomNavigationView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,10 +58,17 @@ class RutasDetalle : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view =  inflater.inflate(R.layout.fragment_rutas_detalle, container, false)
+
         return view
     }
 
-    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
+    override fun onDestroyView() {
+        super.onDestroyView()
+        bottomNavView.visibility = View.VISIBLE
+    }
+
+
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         imagen = view.findViewById(R.id.imageRuta)
         tvNombreRuta = view.findViewById(R.id.tvNombreRuta)
@@ -70,6 +78,10 @@ class RutasDetalle : Fragment() {
         tvTipoRecorridonfoData = view.findViewById(R.id.tvTipoRecorridoInfoData)
         tvDescipcionInfoData = view.findViewById(R.id.tvDescripcionInfoData)
         tvDesnivelData = view.findViewById(R.id.tvDesnivelData)
+
+        bottomNavView = requireActivity().findViewById<BottomNavigationView>(R.id.navigationbtn)
+        bottomNavView.visibility = View.GONE
+
 
         ruta = args.ruta
         tramos = args.tramos
@@ -95,46 +107,20 @@ class RutasDetalle : Fragment() {
 
         val favoritos = view.findViewById<ImageButton>(R.id.favoriteImageButtonDetalles)
         favoritos.setOnClickListener {
+
+
         }
 
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
         mapView = view.findViewById(R.id.mapKml)
-        scrollView = view.findViewById(R.id.scrollView)
 
         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE)
+
+        //mapView.controller.setZoom(10.0)
         mapView.controller.setZoom(15.0)
-        mapView.setTilesScaledToDpi(true); // Tamaño de letra
+        // Centrar el mapa en la Escuela de Ingeniería Informática
+        //mapView.controller.setCenter(org.osmdroid.util.GeoPoint(43.354702, -5.851346))
         mapView.setMultiTouchControls(true)
-
-        //variable para comprobar si el mapa está siendo tocado
-        var isMapViewTouched = false
-
-        //Que hara si tocamos o no el mapa
-        mapView.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    isMapViewTouched = true
-                    scrollView.requestDisallowInterceptTouchEvent(true) //Desactivar scroll
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    isMapViewTouched = false
-                    scrollView.requestDisallowInterceptTouchEvent(false) //Activar scroll
-                }
-            }
-            //El false permite que el zoom y scroll del mapa siga funcionando
-            false
-        }
-
-        //Detecta si el scroll esta siendo tocado
-        scrollView.setOnTouchListener { v, event ->
-            if (!isMapViewTouched) {
-                //Si no estamos tocando el mapa, se vuelve a activar el scroll
-                false
-            } else {
-                //Si tocamos el mapa se detactiva el scroll
-                true
-            }
-        }
 
         lifecycleScope.launch(Dispatchers.IO) {
             mapaKML()
@@ -155,8 +141,9 @@ class RutasDetalle : Fragment() {
                 mapView.invalidate()
 
                 GlobalScope.launch(Dispatchers.Main) {
-                    val boundingBox = kmlOverlay.bounds
-                    mapView.zoomToBoundingBox(boundingBox, true)
+                    val centerPoint = document.mKmlRoot.getBoundingBox().getCenter()
+                    mapView.controller.setCenter(centerPoint)
+                    //mapView.controller.setZoom(0)
                 }
 
 

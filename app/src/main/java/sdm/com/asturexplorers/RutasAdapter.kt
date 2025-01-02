@@ -16,7 +16,7 @@ class RutasAdapter(
     private var listaRutas: List<Ruta>,
     private val onFavoriteClick: (Ruta) -> Unit,
     private val onClickListener: (Ruta?) -> Unit,
-    private var rutasFavoritas: Set<Int> = emptySet()
+    private var rutasFavoritas: Set<Int>
 ) : RecyclerView.Adapter<RutasAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RutasAdapter.ViewHolder {
@@ -41,6 +41,10 @@ class RutasAdapter(
     fun actualizarRutasFavoritas(nuevasFavoritas: Set<Int>) {
         rutasFavoritas = nuevasFavoritas
         notifyDataSetChanged()
+    }
+
+    fun getListaRutas(): List<Ruta> {
+        return listaRutas
     }
 
     class ViewHolder(

@@ -31,6 +31,9 @@ class RutasViewModel(
     private val _rutasFavoritas = MutableLiveData<Set<Int>>()
     val rutasFavoritas: LiveData<Set<Int>> get() = _rutasFavoritas
 
+    private val _buscador = MutableLiveData<String>()
+    val buscador: LiveData<String> get() = _buscador
+
     fun cargarRutasIniciales(json: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val rutasLocales = dbRutas!!.rutaDao.getAll()
@@ -127,8 +130,32 @@ class RutasViewModel(
                 }
     }
 
+    fun aplicarFiltrosYBusqueda(
+        minDistancia: Double,
+        maxDistancia: Double,
+        dificultades: MutableList<String>,
+        tiposRecorrido: MutableList<String>,
+        query: String?
+    ) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val rutasFiltradas = dbRutas!!.rutaDao.filtrarYBuscarRutas(
+                minDistancia,
+                maxDistancia,
+                dificultades,
+                tiposRecorrido,
+                query ?: ""
+            )
+            _rutasLiveData.postValue(rutasFiltradas)
+        }
+    }
+
     fun resetFavoritoState() {
         _favoritoLiveData.postValue(null)
+    }
+
+    fun buscar(newText: String?) {
+        _buscador.postValue(newText ?: "")
     }
 
 }

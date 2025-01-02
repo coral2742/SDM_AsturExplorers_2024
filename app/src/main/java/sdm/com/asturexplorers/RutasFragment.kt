@@ -1,5 +1,6 @@
 package sdm.com.asturexplorers
 
+import MiPerfilViewModel
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -15,6 +16,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -50,7 +52,12 @@ class RutasFragment : Fragment() {
     private lateinit var launcher: ActivityResultLauncher<Intent>
     private lateinit var tvNoHayRutas: TextView
     private lateinit var viewModel : RutasViewModel
-    private lateinit var rutasAdapter: RutasAdapter
+    private var rutasAdapter: RutasAdapter = RutasAdapter(
+        listaRutas = emptyList(),
+        onFavoriteClick = { ruta -> viewModel.manejarFavoritos(ruta) },
+        onClickListener = { ruta -> onClickedRuta(ruta) },
+        emptySet()
+    )
 
 
 
@@ -72,17 +79,9 @@ class RutasFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         inicializar()
         configurarBuscador()
-        cargarFavoritas()
 
         viewModel.rutasLiveData.observe(viewLifecycleOwner, Observer { rutas ->
-            if (rutas.isEmpty()) {
-                tvNoHayRutas.visibility = View.VISIBLE
-                recyclerView.visibility = View.GONE
-            } else {
-                tvNoHayRutas.visibility = View.GONE
-                recyclerView.visibility = View.VISIBLE
-                rutasAdapter.actualizarRutas(rutas)
-            }
+            actualizarRecyclerView(rutas)
         })
 
         viewModel.favoritoLiveData.observe(viewLifecycleOwner, Observer { exito ->
@@ -102,27 +101,20 @@ class RutasFragment : Fragment() {
         viewModel.rutasFavoritas.observe(viewLifecycleOwner) { favoritasIds ->
             rutasAdapter.actualizarRutasFavoritas(favoritasIds)
         }
-    }
 
-    private fun cargarFavoritas() {
-        lifecycleScope.launch {
-            while (SessionManager.currentUser == null) {
-                delay(100)
-            }
-            viewModel.cargarRutasFavoritas()
+        viewModel.buscador.observe(viewLifecycleOwner) { buscador ->
+            aplicarFiltrosYBusqueda(buscador)
         }
     }
 
     private fun configurarBuscador() {
-        svRutas = requireView().findViewById(R.id.svRutas)
-
         svRutas.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return true;
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                aplicarFiltrosYBusqueda(newText)
+                viewModel.buscar(newText)
                 return true
             }
         })
@@ -149,19 +141,13 @@ class RutasFragment : Fragment() {
             if (isEmpty()) addAll(listOf("Senderismo", "Bicicleta", "Coche"))
         }
 
-        // Ejecutar la consulta con filtros y búsqueda
-        lifecycleScope.launch(Dispatchers.IO) {
-            val rutasFiltradas = dbRutas!!.rutaDao.filtrarYBuscarRutas(
-                minDistancia,
-                maxDistancia,
-                dificultades,
-                tiposRecorrido,
-                newText ?: ""
-            )
-            withContext(Dispatchers.Main) {
-                actualizarRecyclerView(rutasFiltradas)
-            }
-        }
+        viewModel.aplicarFiltrosYBusqueda(
+            minDistancia,
+            maxDistancia,
+            dificultades,
+            tiposRecorrido,
+            newText
+        )
     }
 
     private fun actualizarRecyclerView(rutas: List<Ruta>) {
@@ -172,25 +158,7 @@ class RutasFragment : Fragment() {
         } else{
             tvNoHayRutas.visibility = View.GONE
             recyclerView.visibility = View.VISIBLE
-            recyclerView.adapter = RutasAdapter(
-                rutas,
-                onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
-                onClickListener = { ruta -> onClickedRuta(ruta) }
-            )
-        }
-    }
-
-
-    private fun mostrarTodasLasRutas() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val listaRutas = dbRutas!!.rutaDao.getAll()
-            withContext(Dispatchers.Main) {
-                recyclerView.adapter = RutasAdapter(
-                    listaRutas,
-                    onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
-                    onClickListener = { ruta -> onClickedRuta(ruta) }
-                )
-            }
+            rutasAdapter.actualizarRutas(rutas)
         }
     }
 
@@ -200,9 +168,9 @@ class RutasFragment : Fragment() {
 
     private fun procesarResultado(resultado: ActivityResult) {
         if (resultado.resultCode == RESULT_OK){
-            aplicarFiltrosYBusqueda("")
+            aplicarFiltrosYBusqueda(svRutas.query.toString())
         } else{
-            mostrarTodasLasRutas()
+            aplicarFiltrosYBusqueda(svRutas.query.toString())
         }
     }
 
@@ -211,6 +179,7 @@ class RutasFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         btFiltros = requireView().findViewById(R.id.btFiltros)
         tvNoHayRutas = requireView().findViewById(R.id.tvNoHayRutas)
+        svRutas = requireView().findViewById(R.id.svRutas)
         launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
                 resultado -> procesarResultado(resultado)
         }
@@ -219,12 +188,6 @@ class RutasFragment : Fragment() {
             intent.putExtra("ventana", "principal")
             launcher.launch(intent)
         }
-
-        rutasAdapter = RutasAdapter(
-            listaRutas = emptyList(),
-            onFavoriteClick = { ruta -> viewModel.manejarFavoritos(ruta) },
-            onClickListener = { ruta -> onClickedRuta(ruta) }
-        )
         recyclerView.adapter = rutasAdapter
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -232,9 +195,14 @@ class RutasFragment : Fragment() {
             if (listaRutas.isEmpty()) {
                 val json = requireContext().assets.open("rutas.json").bufferedReader().use { it.readText() }
                 viewModel.cargarRutasIniciales(json)
-            } else {
+            } else if (rutasAdapter.itemCount == 0) {
                 viewModel.cargarRutasIniciales("")
             }
+        }
+
+        val currentUser = SessionManager.currentUser
+        if (currentUser != null){
+            viewModel.cargarRutasFavoritas()
         }
 
     }

@@ -13,9 +13,10 @@ import sdm.com.asturexplorers.db.Ruta
 
 
 class RutasAdapter(
-    private val listaRutas: List<Ruta>,
+    private var listaRutas: List<Ruta>,
     private val onFavoriteClick: (Ruta) -> Unit,
-    private val onClickListener: (Ruta?) -> Unit
+    private val onClickListener: (Ruta?) -> Unit,
+    private var rutasFavoritas: Set<Int>
 ) : RecyclerView.Adapter<RutasAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RutasAdapter.ViewHolder {
@@ -25,11 +26,25 @@ class RutasAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(listaRutas[position], onFavoriteClick)
+        holder.bind(listaRutas[position], rutasFavoritas.contains(listaRutas[position].id), onFavoriteClick)
     }
 
     override fun getItemCount(): Int {
         return listaRutas.size
+    }
+
+    fun actualizarRutas(nuevaListaRutas: List<Ruta>) {
+        listaRutas = nuevaListaRutas
+        notifyDataSetChanged()
+    }
+
+    fun actualizarRutasFavoritas(nuevasFavoritas: Set<Int>) {
+        rutasFavoritas = nuevasFavoritas
+        notifyDataSetChanged()
+    }
+
+    fun getListaRutas(): List<Ruta> {
+        return listaRutas
     }
 
     class ViewHolder(
@@ -51,13 +66,18 @@ class RutasAdapter(
             }
         }
         @SuppressLint("SetTextI18n")
-        fun bind(ruta: Ruta, onFavoriteClick: (Ruta) -> Unit) {
+        fun bind(ruta: Ruta, esFavorita: Boolean, onFavoriteClick: (Ruta) -> Unit) {
             rutaActual = ruta
             tvTitulo.text = ruta.nombre
             tvDificultad.text = ruta.dificultad
             tvRecorrido.text = ruta.tipoRecorrido
             tvDistancia.text = ruta.distancia.toString() + " km"
             imageView.load(ruta.imagenUrl)
+
+            favoriteImageButton.setImageResource(
+                if (esFavorita) android.R.drawable.btn_star_big_on
+                else android.R.drawable.btn_star_big_off
+            )
 
             // acción de clic sobre estrella de favoritos
             favoriteImageButton.setOnClickListener {

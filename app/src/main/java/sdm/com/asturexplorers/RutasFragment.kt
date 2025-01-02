@@ -15,6 +15,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 
@@ -25,12 +28,15 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.RutasDatabase
 import sdm.com.asturexplorers.json.JsonParser
+import sdm.com.asturexplorers.mvvm.RutasFragmentViewModelFactory
+import sdm.com.asturexplorers.mvvm.RutasViewModel
 
 
 class RutasFragment : Fragment() {
@@ -43,13 +49,16 @@ class RutasFragment : Fragment() {
     private lateinit var btFiltros: Button
     private lateinit var launcher: ActivityResultLauncher<Intent>
     private lateinit var tvNoHayRutas: TextView
+    private lateinit var viewModel : RutasViewModel
+    private lateinit var rutasAdapter: RutasAdapter
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dbRutas = RutasDatabase.getDB(requireContext())
-        val gson = Gson()
-        jsonParser = JsonParser(gson)
+        viewModel = ViewModelProvider(this,
+            RutasFragmentViewModelFactory(dbRutas, db)).get(RutasViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -63,6 +72,45 @@ class RutasFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         inicializar()
         configurarBuscador()
+        cargarFavoritas()
+
+        viewModel.rutasLiveData.observe(viewLifecycleOwner, Observer { rutas ->
+            if (rutas.isEmpty()) {
+                tvNoHayRutas.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+            } else {
+                tvNoHayRutas.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+                rutasAdapter.actualizarRutas(rutas)
+            }
+        })
+
+        viewModel.favoritoLiveData.observe(viewLifecycleOwner, Observer { exito ->
+            when (exito) {
+                true -> {
+                    Snackbar.make(view, "Ruta añadida a favoritos", Snackbar.LENGTH_SHORT).show()
+                }
+                false -> {
+                    Snackbar.make(view, "Ruta eliminada de favoritos", Snackbar.LENGTH_SHORT).show()
+                }
+                else -> {
+                }
+            }
+            viewModel.resetFavoritoState()
+        })
+
+        viewModel.rutasFavoritas.observe(viewLifecycleOwner) { favoritasIds ->
+            rutasAdapter.actualizarRutasFavoritas(favoritasIds)
+        }
+    }
+
+    private fun cargarFavoritas() {
+        lifecycleScope.launch {
+            while (SessionManager.currentUser == null) {
+                delay(100)
+            }
+            viewModel.cargarRutasFavoritas()
+        }
     }
 
     private fun configurarBuscador() {
@@ -172,22 +220,23 @@ class RutasFragment : Fragment() {
             launcher.launch(intent)
         }
 
-        // Añadir las rutas a Firebase por primera vez
-        //subirRutasAFirebase(rutas)
+        rutasAdapter = RutasAdapter(
+            listaRutas = emptyList(),
+            onFavoriteClick = { ruta -> viewModel.manejarFavoritos(ruta) },
+            onClickListener = { ruta -> onClickedRuta(ruta) }
+        )
+        recyclerView.adapter = rutasAdapter
 
         lifecycleScope.launch(Dispatchers.IO) {
             val listaRutas = dbRutas!!.rutaDao.getAll()
             if (listaRutas.isEmpty()) {
                 val json = requireContext().assets.open("rutas.json").bufferedReader().use { it.readText() }
-
-                val (rutas, tramos) = jsonParser.parseRutas(json)
-                dbRutas!!.rutaDao.insertAll(rutas)
-                dbRutas!!.tramoDao.insertAll(tramos)
+                viewModel.cargarRutasIniciales(json)
+            } else {
+                viewModel.cargarRutasIniciales("")
             }
-            aplicarFiltrosYBusqueda("")
         }
 
-        //recyclerView.adapter = RutasAdapter(rutas)
     }
 
     private fun onClickedRuta(ruta: Ruta?) {

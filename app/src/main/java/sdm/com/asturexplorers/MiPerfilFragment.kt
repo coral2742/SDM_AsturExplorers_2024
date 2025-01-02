@@ -1,16 +1,15 @@
 package sdm.com.asturexplorers
 
 import MiPerfilViewModel
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.viewModels
@@ -21,10 +20,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.FirebaseFirestore
 
 class MiPerfilFragment : Fragment() {
     private val viewModel: MiPerfilViewModel by viewModels()
@@ -37,8 +35,8 @@ class MiPerfilFragment : Fragment() {
     private lateinit var tvUserName: TextView
     private lateinit var tvUserEmail: TextView
     private lateinit var ivUserProfilePic: ImageView
-    private lateinit var inputEmail: EditText
-    private lateinit var inputPassword: EditText
+    private lateinit var inputEmail: TextInputLayout
+    private lateinit var inputPassword: TextInputLayout
     private lateinit var btnGoogleSignIn: Button
     private lateinit var btnSignOut: Button
     private lateinit var btnLogin: Button
@@ -46,7 +44,7 @@ class MiPerfilFragment : Fragment() {
     private lateinit var txtNoTienes: TextView
     private lateinit var txtRegistraAqui: TextView
     private lateinit var btnGoogleSignUp: Button
-    private lateinit var inputRepePassword: EditText
+    private lateinit var inputRepePassword: TextInputLayout
     private lateinit var btnSignUp: Button
     private lateinit var txtIniciaAqui: TextView
     private lateinit var txtYaTienes: TextView
@@ -154,9 +152,11 @@ class MiPerfilFragment : Fragment() {
         }
 
         btnSignUp.setOnClickListener {
-            val email = inputEmail.text.toString()
-            val password = inputPassword.text.toString()
-            val password2 = inputRepePassword.text.toString()
+            val email = inputEmail.editText?.text.toString()
+
+            val password = inputPassword.editText?.text.toString()
+            val password2 = inputRepePassword.editText?.text.toString()
+
 
             if (email.isNotEmpty() && password.isNotEmpty() && password2.isNotEmpty()) {
                 if (password.length < 6){
@@ -174,6 +174,9 @@ class MiPerfilFragment : Fragment() {
                 if (email.isEmpty()) {
                     inputEmail.error = "Por favor, introduce tu email"
                 }
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    inputEmail.error = "Por favor, ingresa un correo electrónico válido"
+                }
                 if (password.isEmpty()) {
                     inputPassword.error = "Por favor, introduce tu contraseña"
                 }
@@ -186,7 +189,7 @@ class MiPerfilFragment : Fragment() {
 
 
         txtOlvidarPass.setOnClickListener {
-            val email = inputEmail.text.toString()
+            val email = inputEmail.editText?.text.toString()
             if (email.isEmpty()) {
                 inputEmail.error = "Por favor ingresa tu correo electrónico."
             } else {
@@ -208,6 +211,7 @@ class MiPerfilFragment : Fragment() {
 
 
     private fun signUpWithEmail(email: String, password: String) {
+        inputEmail.error = "PRUEBA"
         if (email.isEmpty() || password.isEmpty()) {
             if (email.isEmpty()) {
                 inputEmail.error = "Por favor, introduce tu email"
@@ -215,6 +219,7 @@ class MiPerfilFragment : Fragment() {
             if (password.isEmpty()) {
                 inputPassword.error = "Por favor, introduce tu contraseña"
             }
+
             return
         }
 
@@ -244,9 +249,9 @@ class MiPerfilFragment : Fragment() {
         inputEmail.visibility = View.VISIBLE
         inputPassword.visibility = View.VISIBLE
         inputRepePassword.visibility = View.VISIBLE
-        inputEmail.text.clear()
-        inputPassword.text.clear()
-        inputRepePassword.text.clear()
+        inputEmail.editText?.text?.clear()
+        inputPassword.editText?.text?.clear()
+        inputRepePassword.editText?.text?.clear()
         txtOlvidarPass.visibility = View.GONE
         txtNoTienes.visibility = View.GONE
         txtRegistraAqui.visibility = View.GONE
@@ -282,52 +287,6 @@ class MiPerfilFragment : Fragment() {
                 Log.w("MiPerfilFragment", "Google sign in failed", e)
             }
         }
-    }
-
-
-
-
-
-
-
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    Log.d("MiPerfilFragment", "signInWithCredential:success")
-                    val user = auth.currentUser
-                    SessionManager.currentUser = user
-                    updateUI(user)
-
-                    // Verificar si el usuario ya existe en la base de datos
-                    val db = FirebaseFirestore.getInstance()
-                    val userRef = db.collection("rutas_favs").document(user?.uid ?: "")
-
-                    userRef.get().addOnSuccessListener { document ->
-                        if (!document.exists()) {
-                            // El usuario no existe, se añade a la base de datos
-                            val userData = hashMapOf(
-                                "userId" to user?.uid,
-                                "favoritas" to listOf<String>() // Inicializamos con una lista vacía de rutas favoritas
-                            )
-                            userRef.set(userData)
-                                .addOnSuccessListener {
-                                    Log.d("Firestore", "Usuario guardado exitosamente")
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e("Firestore", "Error al guardar los datos del usuario: $e")
-                                }
-                        }
-                    }.addOnFailureListener { e ->
-                        Log.e("Firestore", "Error al verificar si el usuario existe: $e")
-                    }
-
-                } else {
-                    Log.w("MiPerfilFragment", "signInWithCredential:failure", task.exception)
-                    updateUI(null)
-                }
-            }
     }
 
 
@@ -393,8 +352,8 @@ class MiPerfilFragment : Fragment() {
             // Mostrar campos de email y contraseña
             inputEmail.visibility = View.VISIBLE
             inputPassword.visibility = View.VISIBLE
-            inputEmail.text.clear()
-            inputPassword.text.clear()
+            inputEmail.editText?.text?.clear()
+            inputPassword.editText?.text?.clear()
             txtOlvidarPass.visibility = View.VISIBLE
             txtNoTienes.visibility = View.VISIBLE
             txtRegistraAqui.visibility = View.VISIBLE
@@ -407,8 +366,8 @@ class MiPerfilFragment : Fragment() {
     }
 
     private fun signInWithEmail() {
-        val email = inputEmail.text.toString()
-        val password = inputPassword.text.toString()
+        val email = inputEmail.editText?.text.toString()
+        val password = inputPassword.editText?.text.toString()
 
         if (email.isEmpty() || password.isEmpty()) {
             if (email.isEmpty()) {
@@ -428,7 +387,7 @@ class MiPerfilFragment : Fragment() {
                 updateUI(user)
             }
             else {
-                updateUI(null)
+                //updateUI(null)
             }
         })
     }

@@ -37,8 +37,8 @@ class MiPerfilViewModel : ViewModel() {
                     _snackbarMessage.value = "Se ha iniciado sesión correctamente"
                 } else {
                     // Si no es exitoso, asignamos null
-                    _currentUser.value = null
-                    _snackbarMessage.value = "Error: Credenciales inválidas"
+                    //_currentUser.value = null
+                    //_snackbarMessage.value = "Error: Credenciales inválidas"
                 }
             }
     }
@@ -52,7 +52,7 @@ class MiPerfilViewModel : ViewModel() {
                     saveUserDataToFirestore(user)
                 }
                 else {
-                    _currentUser.value = null
+                    //_currentUser.value = null
                     _snackbarMessage.value = "Error: No se pudo crear la cuenta"
                 }
             }

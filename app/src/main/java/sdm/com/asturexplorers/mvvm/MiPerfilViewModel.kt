@@ -38,7 +38,7 @@ class MiPerfilViewModel : ViewModel() {
                 } else {
                     // Si no es exitoso, asignamos null
                     //_currentUser.value = null
-                    //_snackbarMessage.value = "Error: Credenciales inválidas"
+                    _snackbarMessage.value = "Error: Credenciales inválidas"
                 }
             }
     }

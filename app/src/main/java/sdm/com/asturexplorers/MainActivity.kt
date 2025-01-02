@@ -10,7 +10,9 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -24,9 +26,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import sdm.com.asturexplorers.mvvm.MainViewModel
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var auth: FirebaseAuth
+
+    private val viewModel: MainViewModel by viewModels()
+    private lateinit var bottomNavView: BottomNavigationView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,41 +52,16 @@ class MainActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
 
-        val bottomNavView = findViewById<BottomNavigationView>(R.id.navigationbtn)
+        bottomNavView = findViewById<BottomNavigationView>(R.id.navigationbtn)
         val navHostFragment = findNavController(R.id.fragmentContainerView)
         bottomNavView.setupWithNavController(navHostFragment)
 
-
-        setupWithNavController(bottomNavView, navHostFragment)
-
-        auth = FirebaseAuth.getInstance()
-        val user = auth.currentUser
-        SessionManager.currentUser = user
-
-        mostrarConsejos();
+        viewModel.mostrarConsejos(this);
 
 
     }
 
-    private fun mostrarConsejos(){
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Consejo")
-        builder.setMessage("Comprueba el clima, planifica tu ruta y lleva suficiente agua.")
-        builder.setIcon(R.drawable.logo)
-        builder.setPositiveButton("Más info") { _, _ ->
-            val pdfUrl = "https://15f8034cdff6595cbfa1-1dd67c28d3aade9d3442ee99310d18bd.ssl.cf3.rackcdn.com/7202a309d373e716ec4e3d3dc959cbe4/Practica_montanismo_sin_miedo_pero_con_seguridad.pdf"
 
-            // Abrir la guía PDF en el navegador
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl))
-            startActivity(intent)
-        }
-        builder.setNegativeButton("Cerrar") { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.show()
-
-
-    }
 
 
 }

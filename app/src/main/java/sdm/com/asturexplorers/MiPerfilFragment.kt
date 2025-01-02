@@ -1,6 +1,7 @@
 package sdm.com.asturexplorers
 
 import MiPerfilViewModel
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -52,8 +53,33 @@ class MiPerfilFragment : Fragment() {
     private lateinit var divider: View
 
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.currentUser.observe(viewLifecycleOwner) { newUser ->
+            updateUI(newUser)
+        }
+
+        viewModel.snackbarMessage.observe(viewLifecycleOwner, Observer { message ->
+            if (message != null) {
+                Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+            }
+        })
+
+        // Inicio de sesión con Google
+        viewModel.signInIntent.observe(viewLifecycleOwner, Observer { intent ->
+            intent?.let {
+                // Iniciar la actividad de Google Sign-In - necesario para que aparezca pestaña de Google
+                startActivityForResult(it, RC_SIGN_IN)
+
+            }
+        })
+
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         // Inicializa Firebase Auth
         auth = FirebaseAuth.getInstance()
@@ -67,15 +93,11 @@ class MiPerfilFragment : Fragment() {
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
 
 
-        viewModel.currentUser.observe(this) { newUser ->
-            updateUI(newUser);
-        }
 
-        viewModel.errorMessage.observe(viewLifecycleOwner, Observer { message ->
-            if (message != null) {
-                Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
-            }
-        })
+
+
+
+
     }
 
     override fun onCreateView(
@@ -184,6 +206,7 @@ class MiPerfilFragment : Fragment() {
         return view
     }
 
+
     private fun signUpWithEmail(email: String, password: String) {
         if (email.isEmpty() || password.isEmpty()) {
             if (email.isEmpty()) {
@@ -242,14 +265,9 @@ class MiPerfilFragment : Fragment() {
     }
 
     private fun signInWithGoogle() {
-        //val signInIntent = googleSignInClient.signInIntent
-        //startActivityForResult(signInIntent, RC_SIGN_IN)
-
-        viewModel.signInWithGoogle();
-
+        viewModel.signInWithGoogle(requireContext())
     }
 
-    /*
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -258,14 +276,19 @@ class MiPerfilFragment : Fragment() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                firebaseAuthWithGoogle(account.idToken!!)
+                //firebaseAuthWithGoogle(account.idToken!!)
+                viewModel.firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
                 Log.w("MiPerfilFragment", "Google sign in failed", e)
             }
         }
     }
 
-     */
+
+
+
+
+
 
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -405,17 +428,15 @@ class MiPerfilFragment : Fragment() {
                 updateUI(user)
             }
             else {
-                Snackbar.make(requireView(), "No se ha podido iniciar sesión. Inténtalo de nuevo.", Snackbar.LENGTH_SHORT).show()
                 updateUI(null)
             }
         })
     }
 
     private fun signOut() {
-        viewModel.signOut()
+        viewModel.signOut(requireContext())
+
     }
 
-    companion object {
-        fun newInstance(): MiPerfilFragment = MiPerfilFragment()
-    }
+
 }

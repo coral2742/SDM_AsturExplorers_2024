@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -45,6 +46,9 @@ class RutasDetalle : Fragment() {
     private lateinit var mapView: MapView
 
 
+    private lateinit var bottomNavView: BottomNavigationView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -54,8 +58,15 @@ class RutasDetalle : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view =  inflater.inflate(R.layout.fragment_rutas_detalle, container, false)
+
         return view
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        bottomNavView.visibility = View.VISIBLE
+    }
+
 
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,6 +78,10 @@ class RutasDetalle : Fragment() {
         tvTipoRecorridonfoData = view.findViewById(R.id.tvTipoRecorridoInfoData)
         tvDescipcionInfoData = view.findViewById(R.id.tvDescripcionInfoData)
         tvDesnivelData = view.findViewById(R.id.tvDesnivelData)
+
+        bottomNavView = requireActivity().findViewById<BottomNavigationView>(R.id.navigationbtn)
+        bottomNavView.visibility = View.GONE
+
 
         ruta = args.ruta
         tramos = args.tramos

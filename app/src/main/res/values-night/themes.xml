@@ -9,4 +9,6 @@
 
 
     </style>
+
+    <style name="Theme.Asturexplorers" parent="Base.Theme.Asturexplorers" />
 </resources>

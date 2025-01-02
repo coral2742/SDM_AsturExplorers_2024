@@ -39,7 +39,9 @@
         android:id="@+id/rutasDetalle"
         android:name="sdm.com.asturexplorers.RutasDetalle"
         android:label="fragment_rutas_detalle"
-        tools:layout="@layout/fragment_rutas_detalle" >
+        tools:layout="@layout/fragment_rutas_detalle"
+        tools:showIn="false"
+        >
         <argument
             android:name="Ruta"
             app:argType="sdm.com.asturexplorers.db.Ruta" />

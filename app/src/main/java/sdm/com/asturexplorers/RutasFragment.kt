@@ -214,7 +214,8 @@ class RutasFragment : Fragment() {
                 val tramosArray = dbRutas!!.tramoDao.getTramoById(ruta.id)
                 val destino = RutasFragmentDirections.actionNavigationRutasToRutasDetalle(
                     ruta,
-                    tramosArray.toTypedArray()
+                    tramosArray.toTypedArray(),
+                    viewModel.esFavorita(ruta)
                 )
                 findNavController().navigate(destino)
             }

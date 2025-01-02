@@ -80,10 +80,14 @@ class RutasViewModel(
 
     }
 
+    fun esFavorita(ruta: Ruta) : Boolean {
+        return _rutasFavoritas.value?.contains(ruta.id) ?: false
+    }
+
     fun manejarFavoritos(ruta : Ruta){
         val user = SessionManager.currentUser
         if (user != null){
-            if (_rutasFavoritas.value?.contains(ruta.id) == true){
+            if (esFavorita(ruta) == true){
                 eliminarFavortios(ruta, user)
                 val nuevasFavoritas = _rutasFavoritas.value!! - ruta.id
                 _rutasFavoritas.postValue(nuevasFavoritas)

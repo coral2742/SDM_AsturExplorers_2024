@@ -27,6 +27,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.FolderOverlay
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.Tramo
+import kotlin.properties.Delegates
 
 
 class RutasDetalle : Fragment() {
@@ -38,6 +39,7 @@ class RutasDetalle : Fragment() {
     private lateinit var tvTipoRecorridonfoData: TextView
     private lateinit var tvDescipcionInfoData: TextView
     private lateinit var tvDesnivelData: TextView
+    private lateinit var favoriteImageButton : ImageButton
 
     private lateinit var ruta : Ruta
     private lateinit var tramos : Array<Tramo>
@@ -78,6 +80,7 @@ class RutasDetalle : Fragment() {
         tvTipoRecorridonfoData = view.findViewById(R.id.tvTipoRecorridoInfoData)
         tvDescipcionInfoData = view.findViewById(R.id.tvDescripcionInfoData)
         tvDesnivelData = view.findViewById(R.id.tvDesnivelData)
+        favoriteImageButton = view.findViewById(R.id.favoriteImageButtonDetalles)
 
         bottomNavView = requireActivity().findViewById<BottomNavigationView>(R.id.navigationbtn)
         bottomNavView.visibility = View.GONE
@@ -85,6 +88,8 @@ class RutasDetalle : Fragment() {
 
         ruta = args.ruta
         tramos = args.tramos
+        val esFavorita = args.esFavorita
+
         imagen.load(ruta.imagenUrl)
         tvNombreRuta.text = ruta.nombre
         tvDistanciaRuta.text = ruta.distancia.toString() + " Km"
@@ -105,8 +110,13 @@ class RutasDetalle : Fragment() {
         val atras = view.findViewById<ImageButton>(R.id.favoriteImageAtras)
         atras.setOnClickListener { findNavController().popBackStack() }
 
-        val favoritos = view.findViewById<ImageButton>(R.id.favoriteImageButtonDetalles)
-        favoritos.setOnClickListener {
+        favoriteImageButton.setImageResource(
+            if (esFavorita) android.R.drawable.btn_star_big_on
+            else android.R.drawable.btn_star_big_off
+        )
+
+
+        favoriteImageButton.setOnClickListener {
 
 
         }

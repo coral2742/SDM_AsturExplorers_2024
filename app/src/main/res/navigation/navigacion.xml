@@ -48,6 +48,9 @@
         <argument
             android:name="Tramos"
             app:argType="sdm.com.asturexplorers.db.Tramo[]" />
+        <argument
+            android:name="esFavorita"
+            app:argType="boolean" />
     </fragment>
 
 

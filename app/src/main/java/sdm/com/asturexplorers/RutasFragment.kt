@@ -204,6 +204,9 @@ class RutasFragment : Fragment() {
         if (currentUser != null){
             viewModel.cargarRutasFavoritas()
         }
+        else{
+            viewModel.limpiarFavoritos()
+        }
 
     }
 

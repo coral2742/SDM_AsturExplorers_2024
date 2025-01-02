@@ -162,4 +162,8 @@ class RutasViewModel(
         _buscador.postValue(newText ?: "")
     }
 
+    fun limpiarFavoritos() {
+        _rutasFavoritas.postValue(emptySet())
+    }
+
 }

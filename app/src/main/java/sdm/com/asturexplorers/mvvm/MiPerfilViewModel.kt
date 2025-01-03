@@ -18,7 +18,7 @@ class MiPerfilViewModel : ViewModel() {
     private val _auth: FirebaseAuth = FirebaseAuth.getInstance()
 
 
-    private val _currentUser = MutableLiveData<FirebaseUser?>(null);
+    private val _currentUser = MutableLiveData<FirebaseUser?>(SessionManager.currentUser);
     val currentUser : MutableLiveData<FirebaseUser?>
         get() = _currentUser
 

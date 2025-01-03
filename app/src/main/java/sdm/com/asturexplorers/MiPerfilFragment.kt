@@ -78,7 +78,6 @@ class MiPerfilFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         // Inicializa Firebase Auth
         auth = FirebaseAuth.getInstance()
 
@@ -89,13 +88,6 @@ class MiPerfilFragment : Fragment() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
-
-
-
-
-
-
-
     }
 
     override fun onCreateView(
@@ -105,14 +97,9 @@ class MiPerfilFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_mi_perfil, container, false)
 
         btnGoogleSignIn = view.findViewById(R.id.btnGoogleSignIn)
-
         btnLogin = view.findViewById(R.id.btnLogin)
-
         btnSignOut = view.findViewById(R.id.btnSignOut)
-
         btnSignUp = view.findViewById(R.id.btnSignUp)
-
-
         
 
         tvTitle = view.findViewById(R.id.textTitle)
@@ -152,39 +139,7 @@ class MiPerfilFragment : Fragment() {
         }
 
         btnSignUp.setOnClickListener {
-            val email = inputEmail.editText?.text.toString()
-
-            val password = inputPassword.editText?.text.toString()
-            val password2 = inputRepePassword.editText?.text.toString()
-
-
-            if (email.isNotEmpty() && password.isNotEmpty() && password2.isNotEmpty()) {
-                if (password.length < 6){
-                    inputPassword.error = "La contraseña debe tener al menos 6 caracteres"
-                }
-                else if (password == password2){
-                    signUpWithEmail(email, password)
-                }
-                else{
-                    inputRepePassword.error = "Las contraseñas no coinciden"
-                }
-
-            }
-            else{
-                if (email.isEmpty()) {
-                    inputEmail.error = "Por favor, introduce tu email"
-                }
-                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    inputEmail.error = "Por favor, ingresa un correo electrónico válido"
-                }
-                if (password.isEmpty()) {
-                    inputPassword.error = "Por favor, introduce tu contraseña"
-                }
-                if (password2.isEmpty()) {
-                    inputRepePassword.error = "Por favor, repite tu contraseña"
-                }
-
-            }
+            checkSignUp()
         }
 
 
@@ -209,9 +164,41 @@ class MiPerfilFragment : Fragment() {
         return view
     }
 
+    private fun checkSignUp() {
+        val email = inputEmail.editText?.text.toString()
+
+        val password = inputPassword.editText?.text.toString()
+        val password2 = inputRepePassword.editText?.text.toString()
+
+
+        if (email.isNotEmpty() && password.isNotEmpty() && password2.isNotEmpty()) {
+            if (password.length < 6) {
+                inputPassword.error = "La contraseña debe tener al menos 6 caracteres"
+            } else if (password == password2) {
+                signUpWithEmail(email, password)
+            } else {
+                inputRepePassword.error = "Las contraseñas no coinciden"
+            }
+
+        } else {
+            if (email.isEmpty()) {
+                inputEmail.error = "Por favor, introduce tu email"
+            }
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                inputEmail.error = "Por favor, ingresa un correo electrónico válido"
+            }
+            if (password.isEmpty()) {
+                inputPassword.error = "Por favor, introduce tu contraseña"
+            }
+            if (password2.isEmpty()) {
+                inputRepePassword.error = "Por favor, repite tu contraseña"
+            }
+
+        }
+    }
+
 
     private fun signUpWithEmail(email: String, password: String) {
-        inputEmail.error = "PRUEBA"
         if (email.isEmpty() || password.isEmpty()) {
             if (email.isEmpty()) {
                 inputEmail.error = "Por favor, introduce tu email"
@@ -262,7 +249,10 @@ class MiPerfilFragment : Fragment() {
         btnGoogleSignUp.visibility = View.VISIBLE
         divider.visibility = View.GONE
 
-
+        //Borrar posibles avisos de error
+        inputPassword.isErrorEnabled=false
+        inputEmail.isErrorEnabled=false
+        inputRepePassword.isErrorEnabled=false
     }
 
     private fun sendPasswordResetEmail(email: String) {
@@ -362,6 +352,10 @@ class MiPerfilFragment : Fragment() {
 
             btnGoogleSignUp.visibility = View.GONE
             divider.visibility = View.VISIBLE
+
+            //Borrar posibles avisos de error
+            inputPassword.isErrorEnabled=false
+            inputEmail.isErrorEnabled=false
         }
     }
 

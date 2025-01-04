@@ -169,53 +169,58 @@ class MiPerfilFragment : Fragment() {
         return view
     }
 
+    /**
+     * Comprueba que los campos de registro están rellenos correctamente
+     */
     private fun checkSignUp() {
-        val email = inputEmail.editText?.text.toString()
+        //Borrar posibles avisos de error
+        inputPassword.isErrorEnabled=false
+        inputEmail.isErrorEnabled=false
+        inputRepePassword.isErrorEnabled=false
 
+        val email = inputEmail.editText?.text.toString()
         val password = inputPassword.editText?.text.toString()
         val password2 = inputRepePassword.editText?.text.toString()
 
+        var isValid=true
 
-        if (email.isNotEmpty() && password.isNotEmpty() && password2.isNotEmpty()) {
-            if (password.length < 6) {
-                inputPassword.error = "La contraseña debe tener al menos 6 caracteres"
-            } else if (password == password2) {
-                signUpWithEmail(email, password)
-            } else {
-                inputRepePassword.error = "Las contraseñas no coinciden"
-            }
-
-        } else {
-            if (email.isEmpty()) {
-                inputEmail.error = "Por favor, introduce tu email"
-            }
+        //Compruebo email
+        if (email.isEmpty()) {
+            inputEmail.error = "Por favor, introduce tu email"
+            isValid=false
+        }else{
             if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 inputEmail.error = "Por favor, ingresa un correo electrónico válido"
+                isValid=false
             }
-            if (password.isEmpty()) {
-                inputPassword.error = "Por favor, introduce tu contraseña"
-            }
-            if (password2.isEmpty()) {
-                inputRepePassword.error = "Por favor, repite tu contraseña"
-            }
-
-        }
-    }
-
-
-    private fun signUpWithEmail(email: String, password: String) {
-        if (email.isEmpty() || password.isEmpty()) {
-            if (email.isEmpty()) {
-                inputEmail.error = "Por favor, introduce tu email"
-            }
-            if (password.isEmpty()) {
-                inputPassword.error = "Por favor, introduce tu contraseña"
-            }
-
-            return
         }
 
-        viewModel.signUpWithEmail(email, password)
+        //Compruebo contraseña
+        if (password.isEmpty()) {
+            inputPassword.error = "Por favor, introduce tu contraseña"
+            isValid=false
+        }else{
+            if (password.length < 6) {
+                inputPassword.error = "La contraseña debe tener al menos 6 caracteres"
+                isValid=false
+            }
+        }
+
+        //Compruebo repetición contraseña
+        if (password2.isEmpty()) {
+            inputRepePassword.error = "Por favor, repite tu contraseña"
+            isValid=false
+        }else{
+            if (password != password2) {
+                inputRepePassword.error = "Las contraseñas no coinciden"
+                isValid=false
+            }
+        }
+
+        //Si todos los campos están rellenos correctamente, crear cuenta
+        if(isValid){
+            viewModel.signUpWithEmail(email, password)
+        }
     }
 
     // UI Crear cuenta

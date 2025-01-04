@@ -34,6 +34,7 @@ class MiPerfilViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     // Asignamos el usuario si el login es exitoso
                     _currentUser.value = _auth.currentUser
+                    SessionManager.currentUser = _auth.currentUser
                     _snackbarMessage.value = "Se ha iniciado sesión correctamente"
                 } else {
                     // Si no es exitoso, asignamos null
@@ -50,6 +51,8 @@ class MiPerfilViewModel : ViewModel() {
                     val user = _auth.currentUser
                     _currentUser.value = user
                     saveUserDataToFirestore(user)
+
+                    SessionManager.currentUser = user
                 }
                 else {
                     //_currentUser.value = null
@@ -79,6 +82,7 @@ class MiPerfilViewModel : ViewModel() {
 
 
     fun sendPasswordResetEmail(email: String) {
+
         _auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -86,10 +90,16 @@ class MiPerfilViewModel : ViewModel() {
                     _snackbarMessage.value = "Se ha enviado el correo de recuperación"
 
                 } else {
-                    Log.w("MiPerfilFragment", "Error al enviar correo de recuperación", task.exception)
-                    _snackbarMessage.value = "Error: No se ha podido enviar el correo de recuperación"
+                    Log.w(
+                        "MiPerfilFragment",
+                        "Error al enviar correo de recuperación",
+                        task.exception
+                    )
+                    _snackbarMessage.value =
+                        "Error: No se ha podido enviar el correo de recuperación"
                 }
             }
+
     }
 
 
@@ -98,6 +108,7 @@ class MiPerfilViewModel : ViewModel() {
 
     fun signInWithGoogle(context: Context) {
         // Configura Google Sign-In
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(context.getString(R.string.default_web_client_id))
             .requestEmail()
@@ -107,6 +118,9 @@ class MiPerfilViewModel : ViewModel() {
         val signInIntent = googleSignInClient.signInIntent
 
         _signInIntent.value = signInIntent
+        val user = FirebaseAuth.getInstance().currentUser
+        _currentUser.value = user
+        SessionManager.currentUser = user
     }
 
 
@@ -164,6 +178,14 @@ class MiPerfilViewModel : ViewModel() {
         _currentUser.value = null
         SessionManager.currentUser = null
 
+        _snackbarMessage.value = "Se ha cerrado sesión correctamente"
+        _snackbarMessage.value = ""
+
+        googleSignInClient.signOut()
+        _signInIntent.value = null
+
+        /*
+
         // Cerrar sesión del cliente de Google
         googleSignInClient.signOut().addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -172,6 +194,8 @@ class MiPerfilViewModel : ViewModel() {
                 _snackbarMessage.value = "Error al cerrar sesión con Google: ${task.exception?.message}"
             }
         }
+
+         */
     }
 
 

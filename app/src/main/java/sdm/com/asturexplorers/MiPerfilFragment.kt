@@ -27,7 +27,7 @@ import com.google.firebase.auth.FirebaseUser
 class MiPerfilFragment : Fragment() {
     private val viewModel: MiPerfilViewModel by viewModels()
 
-    private lateinit var auth: FirebaseAuth
+    //private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 9001
 
@@ -58,7 +58,7 @@ class MiPerfilFragment : Fragment() {
         }
 
         viewModel.snackbarMessage.observe(viewLifecycleOwner, Observer { message ->
-            if (message != null) {
+            if (message != null && message.isNotEmpty()) {
                 Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
             }
         })
@@ -66,8 +66,10 @@ class MiPerfilFragment : Fragment() {
         // Inicio de sesión con Google
         viewModel.signInIntent.observe(viewLifecycleOwner, Observer { intent ->
             intent?.let {
-                // Iniciar la actividad de Google Sign-In - necesario para que aparezca pestaña de Google
-                startActivityForResult(it, RC_SIGN_IN)
+                if (viewModel.signInIntent.value != null) {
+                    // Iniciar la actividad de Google Sign-In - necesario para que aparezca pestaña de Google
+                    startActivityForResult(it, RC_SIGN_IN)
+                }
 
             }
         })
@@ -78,8 +80,9 @@ class MiPerfilFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         // Inicializa Firebase Auth
-        auth = FirebaseAuth.getInstance()
+        //auth = FirebaseAuth.getInstance()
 
         // Configura Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -88,6 +91,8 @@ class MiPerfilFragment : Fragment() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+
+
     }
 
     override fun onCreateView(
@@ -146,7 +151,7 @@ class MiPerfilFragment : Fragment() {
         txtOlvidarPass.setOnClickListener {
             val email = inputEmail.editText?.text.toString()
             if (email.isEmpty()) {
-                inputEmail.error = "Por favor ingresa tu correo electrónico."
+                inputEmail.error = "Por favor ingresa tu correo electrónico para recuperar la contraseña."
             } else {
                 sendPasswordResetEmail(email)
             }
@@ -157,9 +162,9 @@ class MiPerfilFragment : Fragment() {
         }
 
         // Verifica si el usuario ya está autenticado
-        val currentUser = auth.currentUser
-        SessionManager.currentUser = currentUser
-        updateUI(currentUser)
+        //val currentUser = auth.currentUser
+        //SessionManager.currentUser = currentUser
+        //updateUI(currentUser)
 
         return view
     }
@@ -271,7 +276,6 @@ class MiPerfilFragment : Fragment() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                //firebaseAuthWithGoogle(account.idToken!!)
                 viewModel.firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
                 Log.w("MiPerfilFragment", "Google sign in failed", e)
@@ -381,7 +385,7 @@ class MiPerfilFragment : Fragment() {
                 updateUI(user)
             }
             else {
-                //updateUI(null)
+                updateUI(null)
             }
         })
     }

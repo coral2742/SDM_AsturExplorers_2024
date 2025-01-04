@@ -21,13 +21,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 class MiPerfilFragment : Fragment() {
     private val viewModel: MiPerfilViewModel by viewModels()
 
-    //private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 9001
 
@@ -70,19 +68,13 @@ class MiPerfilFragment : Fragment() {
                     // Iniciar la actividad de Google Sign-In - necesario para que aparezca pestaña de Google
                     startActivityForResult(it, RC_SIGN_IN)
                 }
-
             }
         })
-
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-        // Inicializa Firebase Auth
-        //auth = FirebaseAuth.getInstance()
 
         // Configura Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -91,7 +83,6 @@ class MiPerfilFragment : Fragment() {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
-
 
     }
 
@@ -160,13 +151,21 @@ class MiPerfilFragment : Fragment() {
         txtRegistraAqui.setOnClickListener {
             updateUISignUp()
         }
-
-        // Verifica si el usuario ya está autenticado
-        //val currentUser = auth.currentUser
-        //SessionManager.currentUser = currentUser
-        //updateUI(currentUser)
-
         return view
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                viewModel.firebaseAuthWithGoogle(account.idToken!!)
+            } catch (e: ApiException) {
+                Log.w("MiPerfilFragment", "Google sign in failed", e)
+            }
+        }
     }
 
     /**
@@ -223,7 +222,39 @@ class MiPerfilFragment : Fragment() {
         }
     }
 
-    // UI Crear cuenta
+    /**
+     * Comprobación de campos. Inicia sesión con email y contraseña
+     */
+    private fun signInWithEmail() {
+        val email = inputEmail.editText?.text.toString()
+        val password = inputPassword.editText?.text.toString()
+
+        if (email.isEmpty() || password.isEmpty()) {
+            if (email.isEmpty()) {
+                inputEmail.error = "Por favor, introduce tu email"
+            }
+            if (password.isEmpty()) {
+                inputPassword.error = "Por favor, introduce tu contraseña"
+            }
+            return
+        }
+        viewModel.signInWithEmail(email, password)
+
+        // Observamos el LiveData para manejar la respuesta
+        viewModel.currentUser.observe(viewLifecycleOwner, Observer { user ->
+            if (user != null) {
+                SessionManager.currentUser = user
+                updateUI(user)
+            }
+            else {
+                updateUI(null)
+            }
+        })
+    }
+
+    /**
+     * Actualiza la interfaz de usuario para el registro
+     */
     private fun updateUISignUp() {
         // Botones de inicio de sesión
         btnGoogleSignIn.visibility = View.GONE
@@ -265,30 +296,10 @@ class MiPerfilFragment : Fragment() {
         inputRepePassword.isErrorEnabled=false
     }
 
-    private fun sendPasswordResetEmail(email: String) {
-        viewModel.sendPasswordResetEmail(email);
-    }
-
-    private fun signInWithGoogle() {
-        viewModel.signInWithGoogle(requireContext())
-    }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == RC_SIGN_IN) {
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                viewModel.firebaseAuthWithGoogle(account.idToken!!)
-            } catch (e: ApiException) {
-                Log.w("MiPerfilFragment", "Google sign in failed", e)
-            }
-        }
-    }
-
-
+    /**
+     * Actualiza la interfaz de usuario con la información del usuario
+     * o la pantalla de inicio de sesión si no hay usuario logueado
+     */
     private fun updateUI(user: FirebaseUser?) {
         // Usuario con sesión iniciada
         if (user != null) {
@@ -368,36 +379,19 @@ class MiPerfilFragment : Fragment() {
         }
     }
 
-    private fun signInWithEmail() {
-        val email = inputEmail.editText?.text.toString()
-        val password = inputPassword.editText?.text.toString()
-
-        if (email.isEmpty() || password.isEmpty()) {
-            if (email.isEmpty()) {
-                inputEmail.error = "Por favor, introduce tu email"
-            }
-            if (password.isEmpty()) {
-                inputPassword.error = "Por favor, introduce tu contraseña"
-            }
-            return
-        }
-        viewModel.signInWithEmail(email, password)
-
-        // Observamos el LiveData para manejar la respuesta
-        viewModel.currentUser.observe(viewLifecycleOwner, Observer { user ->
-            if (user != null) {
-                SessionManager.currentUser = user
-                updateUI(user)
-            }
-            else {
-                updateUI(null)
-            }
-        })
+    private fun sendPasswordResetEmail(email: String) {
+        viewModel.sendPasswordResetEmail(email);
     }
 
+    private fun signInWithGoogle() {
+        viewModel.signInWithGoogle(requireContext())
+    }
+
+    /**
+     * Cierra la sesión del usuario
+     */
     private fun signOut() {
         viewModel.signOut(requireContext())
-
     }
 
 

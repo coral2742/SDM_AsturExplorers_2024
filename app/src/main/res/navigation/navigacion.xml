@@ -21,6 +21,9 @@
         android:name="sdm.com.asturexplorers.FavoritosFragment"
         android:label="fragment_favoritos"
         tools:layout="@layout/fragment_favoritos" >
+        <action
+            android:id="@+id/action_navigation_favoritos_to_rutasDetalle"
+            app:destination="@id/rutasDetalle" />
     </fragment>
 
     <fragment

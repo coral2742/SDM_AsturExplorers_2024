@@ -87,7 +87,7 @@ class FavoritosFragment : Fragment() {
 
     private fun procesarResultado(resultado: ActivityResult) {
         if (resultado.resultCode == RESULT_OK){
-            aplicarFiltrosYBusqueda("")
+            aplicarFiltrosYBusqueda(svRutas.query.toString())
         } else{
             setupUI()
         }
@@ -146,10 +146,24 @@ class FavoritosFragment : Fragment() {
             recyclerView.adapter = RutasFavAdapter(
                 rutas,
                 onFavoriteClick = { ruta -> onFavoritoClicked(ruta) },
-                onClickListener = { ruta ->
-                    //onClickedRuta(ruta)
-                }
+                onClickListener = { ruta -> onClickedRuta(ruta) }
             )
+    }
+
+    private fun onClickedRuta(ruta: Ruta?) {
+        if (ruta != null) {
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                val tramosArray = dbRutas!!.tramoDao.getTramoById(ruta.id)
+                val destino = FavoritosFragmentDirections.actionNavigationFavoritosToRutasDetalle(
+                    ruta,
+                    tramosArray.toTypedArray(),
+                    true
+                )
+                findNavController().navigate(destino)
+            }
+
+        }
     }
 
     companion object {
@@ -249,7 +263,7 @@ class FavoritosFragment : Fragment() {
     }
 
     private fun obtenerDetallesRutasFavoritas(favoritas: List<Int>) {
-        aplicarFiltrosYBusqueda("")
+        aplicarFiltrosYBusqueda(svRutas.query.toString())
     }
 
 

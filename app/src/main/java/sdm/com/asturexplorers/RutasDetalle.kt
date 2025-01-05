@@ -18,6 +18,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -48,6 +52,8 @@ class RutasDetalle : Fragment() {
 
     private val args : RutasDetalleArgs by this.navArgs()
     private lateinit var mapView: MapView
+    private val db = FirebaseFirestore.getInstance()
+
 
     private lateinit var scrollView: NestedScrollView
     private lateinit var bottomNavView: BottomNavigationView
@@ -90,7 +96,7 @@ class RutasDetalle : Fragment() {
 
         ruta = args.ruta
         tramos = args.tramos
-        val esFavorita = args.esFavorita
+        var esFavorita = args.esFavorita
 
         imagen.load(ruta.imagenUrl)
         tvNombreRuta.text = ruta.nombre
@@ -119,8 +125,22 @@ class RutasDetalle : Fragment() {
 
 
         favoriteImageButton.setOnClickListener {
+            if (esFavorita){
+                esFavorita = false
+                favoriteImageButton.setImageResource(android.R.drawable.btn_star_big_off)
+                val user = SessionManager.currentUser
+                if (user != null){
+                    eliminarFavortios(user)
+                }
 
-
+            } else{
+                esFavorita = true
+                favoriteImageButton.setImageResource(android.R.drawable.btn_star_big_on)
+                val user = SessionManager.currentUser
+                if (user != null){
+                    agregarAFavoritos(user)
+                }
+            }
         }
 
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
@@ -165,6 +185,34 @@ class RutasDetalle : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             mapaKML()
         }
+    }
+
+    private fun agregarAFavoritos(user: FirebaseUser) {
+        // Si el usuario está autenticado
+        Log.d("RutasViewModel", "AÑADIENDO A FAV: Usuario autenticado: ${user.uid}")
+        db.collection("rutas_favs")
+            .document(user.uid)
+            .update("favoritas", FieldValue.arrayUnion(ruta.id))
+            .addOnSuccessListener {
+                Snackbar.make(requireView(), "Ruta añadida a favoritos", Snackbar.LENGTH_SHORT).show()
+                Log.w("RutasViewModel", "Ruta añadida a favoritos ${ruta.nombre}")
+            }
+            .addOnFailureListener { e ->
+                Log.w("RutasViewModel", "Error al añadir ruta a favoritos", e)
+            }
+    }
+
+    private fun eliminarFavortios(user: FirebaseUser) {
+        db.collection("rutas_favs")
+            .document(user.uid)
+            .update("favoritas", FieldValue.arrayRemove(ruta.id))
+            .addOnSuccessListener {
+                Snackbar.make(requireView(), "Ruta eliminada de favoritos", Snackbar.LENGTH_SHORT).show()
+                Log.w("FavoritosFragment", "Ruta eliminada de favoritos ${ruta.nombre}")
+            }
+            .addOnFailureListener { e ->
+                Log.w("FavoritosFragment", "Error al eliminar ruta de favoritos", e)
+            }
     }
 
     private fun mapaKML(){

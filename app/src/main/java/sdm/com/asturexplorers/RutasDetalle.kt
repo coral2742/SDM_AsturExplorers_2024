@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
+import com.colormoon.readmoretextview.ReadMoreTextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseUser
@@ -43,7 +44,7 @@ class RutasDetalle : Fragment() {
     private lateinit var tvDistanciaInfoData: TextView
     private lateinit var tvDificultadInfoData: TextView
     private lateinit var tvTipoRecorridonfoData: TextView
-    private lateinit var tvDescipcionInfoData: TextView
+    private lateinit var tvDescipcionInfoData: ReadMoreTextView
     private lateinit var tvDesnivelData: TextView
     private lateinit var favoriteImageButton : ImageButton
 
@@ -114,6 +115,11 @@ class RutasDetalle : Fragment() {
             cadena += descripcionTextoPlano + "\n"
         }
         tvDescipcionInfoData.text = cadena
+
+        tvDescipcionInfoData.setCollapsedText("Ver más")
+        tvDescipcionInfoData.setExpandedText("Ver menos")
+
+        tvDescipcionInfoData.setTrimLines(5)
 
         val atras = view.findViewById<ImageButton>(R.id.favoriteImageAtras)
         atras.setOnClickListener { findNavController().popBackStack() }

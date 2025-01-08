@@ -81,9 +81,8 @@ class RegisterOkTest {
         )
         materialTextView.perform(click())
 
-        Thread.sleep(2000)
-
-        val textInputEditText = onView(
+        val em="testing" + System.currentTimeMillis() + "@email.com"
+        onView(
             allOf(
                 withId(R.id.inputEmailText),
                 childAtPosition(
@@ -95,11 +94,9 @@ class RegisterOkTest {
                 ),
                 isDisplayed()
             )
-        )
-        val em="testing" + System.currentTimeMillis() + "@email.com"
-        textInputEditText.perform(replaceText(em), closeSoftKeyboard())
+        ).perform(replaceText(em), closeSoftKeyboard())
 
-        val textInputEditText2 = onView(
+        onView(
             allOf(
                 withId(R.id.passwordEditText),
                 childAtPosition(
@@ -111,8 +108,7 @@ class RegisterOkTest {
                 ),
                 isDisplayed()
             )
-        )
-        textInputEditText2.perform(replaceText("testing"), closeSoftKeyboard())
+        ).perform(replaceText("testing"), closeSoftKeyboard())
 
         val textInputEditText3 = onView(
             allOf(

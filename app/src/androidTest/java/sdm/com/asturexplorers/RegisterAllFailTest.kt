@@ -82,9 +82,7 @@ class RegisterAllFailTest {
         )
         materialTextView.perform(click())
 
-        Thread.sleep(2000)
-
-        val textInputEditText = onView(
+        onView(
             allOf(
                 withId(R.id.inputEmailText),
                 childAtPosition(
@@ -96,8 +94,7 @@ class RegisterAllFailTest {
                 ),
                 isDisplayed()
             )
-        )
-        textInputEditText.perform(replaceText("a"), closeSoftKeyboard())
+        ).perform(replaceText("a"), closeSoftKeyboard())
 
         val textInputEditText2 = onView(
             allOf(

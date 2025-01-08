@@ -45,7 +45,9 @@ android {
 dependencies {
     implementation("com.google.code.gson:gson:2.8.9")
     implementation(libs.firebase.firestore.ktx)
-    androidTestImplementation(libs.androidx.espresso.contrib)
+    androidTestImplementation(libs.androidx.espresso.contrib){
+        exclude(group = "com.google.protobuf", module = "protobuf-lite")
+    }
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")

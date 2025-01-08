@@ -34,7 +34,6 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.FolderOverlay
 import sdm.com.asturexplorers.db.Ruta
 import sdm.com.asturexplorers.db.Tramo
-import kotlin.properties.Delegates
 
 
 class RutasDetalle : Fragment() {

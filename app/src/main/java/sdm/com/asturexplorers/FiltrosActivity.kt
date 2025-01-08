@@ -2,6 +2,7 @@ package sdm.com.asturexplorers
 
 import android.content.Context
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
@@ -64,6 +65,12 @@ class FiltrosActivity : AppCompatActivity() {
             setResult(RESULT_CANCELED)
             finish()
         }
+
+        // Oculta la barra de estado
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
     }
 
     private fun guardarFiltrosEnSharedPreferences() {

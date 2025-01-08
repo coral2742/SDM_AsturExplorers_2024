@@ -118,7 +118,8 @@ class RutasDetalle : Fragment() {
 
         tvDescipcionInfoData.setCollapsedText("Ver más")
         tvDescipcionInfoData.setExpandedText("Ver menos")
-
+        tvDescipcionInfoData.setCollapsedTextColor(R.color.green)
+        tvDescipcionInfoData.setExpandedTextColor(R.color.green)
         tvDescipcionInfoData.setTrimLines(5)
 
         val atras = view.findViewById<ImageButton>(R.id.favoriteImageAtras)
@@ -147,6 +148,12 @@ class RutasDetalle : Fragment() {
                     agregarAFavoritos(user)
                 }
             }
+        }
+
+        if(SessionManager.currentUser != null){
+            favoriteImageButton.visibility = View.VISIBLE
+        }else{
+            favoriteImageButton.visibility = View.GONE
         }
 
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME

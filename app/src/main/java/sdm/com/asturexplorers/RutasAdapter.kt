@@ -1,5 +1,6 @@
 package sdm.com.asturexplorers
 
+import MiPerfilViewModel
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
@@ -7,12 +8,15 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import sdm.com.asturexplorers.db.Ruta
+import sdm.com.asturexplorers.mvvm.MainViewModel
 
 
-class RutasAdapter(
+class RutasAdapter (
     private var listaRutas: List<Ruta>,
     private val onFavoriteClick: (Ruta) -> Unit,
     private val onClickListener: (Ruta?) -> Unit,
@@ -79,8 +83,15 @@ class RutasAdapter(
                 else android.R.drawable.btn_star_big_off
             )
 
+            if(SessionManager.currentUser != null){
+                favoriteImageButton.visibility = View.VISIBLE
+            }else{
+                favoriteImageButton.visibility = View.GONE
+            }
+
             // acción de clic sobre estrella de favoritos
             favoriteImageButton.setOnClickListener {
+
                 rutaActual?.let { ruta ->
                     val isSelected = favoriteImageButton.isSelected
                     favoriteImageButton.isSelected = !isSelected

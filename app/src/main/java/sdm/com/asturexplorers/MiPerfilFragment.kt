@@ -96,7 +96,7 @@ class MiPerfilFragment : Fragment() {
         btnLogin = view.findViewById(R.id.btnLogin)
         btnSignOut = view.findViewById(R.id.btnSignOut)
         btnSignUp = view.findViewById(R.id.btnSignUp)
-        
+
 
         tvTitle = view.findViewById(R.id.textTitle)
         tvUserName = view.findViewById(R.id.txtNombre)
@@ -317,7 +317,7 @@ class MiPerfilFragment : Fragment() {
             btnSignOut.visibility = View.VISIBLE
 
             // Cambiar título
-            tvTitle.text = "Mi Perfil"
+            tvTitle.text = ""
 
             // Mostrar la información del usuario
             if (tvUserName.text.isEmpty() || tvUserEmail.text.isEmpty()){

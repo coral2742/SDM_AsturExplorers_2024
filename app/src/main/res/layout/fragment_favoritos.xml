@@ -29,25 +29,16 @@
             android:id="@+id/tvTituloApplicacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginBottom="10dp"
             android:layout_toEndOf="@id/imageLogo"
-            android:text="AsturExplorers"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="Favoritos"
+            android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="24sp" />
+            android:textSize="30sp" />
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/txtNombre"
-        android:layout_width="273dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="FAVORITOS"
-        android:textColor="@color/black"
-        android:textSize="32sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/svRutasFav" />
 
     <TextView
         android:id="@+id/textWelcomeMessage"
@@ -65,12 +56,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtNombre" />
+        app:layout_constraintTop_toBottomOf="@id/btFiltrosFav" />
 
     <Button
         android:id="@+id/btnIniciarSesion"

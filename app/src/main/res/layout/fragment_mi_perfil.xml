@@ -41,21 +41,23 @@
             android:id="@+id/tvTituloApplicacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginBottom="10dp"
             android:layout_toEndOf="@id/imageLogo"
-            android:text="AsturExplorers"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="Mi Perfil"
+            android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="24sp" />
+            android:textSize="30sp" />
 
     </RelativeLayout>
 
     <TextView
         android:id="@+id/textTitle"
-        android:layout_width="386dp"
-        android:layout_height="46dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="MI PERFIL"
         android:textColor="@color/black"
         android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="parent"

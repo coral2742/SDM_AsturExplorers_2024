@@ -34,7 +34,8 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="16dp"
             android:layout_toEndOf="@id/imageLogo"
-            android:text="AsturExplorers"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="Rutas"
             android:textColor="@color/white"
             android:textSize="24sp" />
     </RelativeLayout>

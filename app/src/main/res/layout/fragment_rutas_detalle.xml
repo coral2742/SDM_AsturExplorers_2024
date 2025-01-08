@@ -29,12 +29,15 @@
             android:id="@+id/tvTituloApplicacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="50dp"
+            android:layout_marginBottom="10dp"
             android:layout_toEndOf="@id/imageLogo"
-            android:text="AsturExplorers"
+            android:fontFamily="sans-serif-smallcaps"
+            android:text="Rutas"
+            android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="24sp" />
+            android:textSize="30sp" />
     </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView

@@ -32,5 +32,5 @@ AsturExplorers es una app móvil desarrollada en Kotlin diseñada para los amant
 
 - **Acceso a la ubicación**: Se utiliza la geolocalización del dispositivo para mostrar rutas cercanas y sugerencias basadas en la ubicación.
 
-
+<img src="./resources/AsturExplorers-SDM.gif" alt="SDM AsturExplorers video" width="300"/>
 
